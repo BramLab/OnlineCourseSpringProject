@@ -1,0 +1,20 @@
+
+IntelliJ new project:
+LINKERZIJDE: Generators: Spring Boot
+RECHTERZIJDE:
+Name: OnlineCourseSpringProject
+Location: ~\IdeaProjects
+Create Git repository.
+Type: Maven
+Group: (org.intecbrussel.be)
+Package name: (org.intecbrussel.onlinecoursespringproject  <- automatisch)
+JDK 17, JAR
+Next
+---
+
+Dependencies:
+Spring Web
+Spring Data JPA
+MySQL Driver
+Lombok
+(Spring security?)

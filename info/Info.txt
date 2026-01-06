@@ -1,0 +1,208 @@
+
+In Teams/Spring 2026-01-05T09:12
+
+OnlineCourseSpringProject.
+Beste 25-Java-Maart
+
+Jullie hebben de tijd tot 15 januari om 16.00 uur.
+Vergeet niet om mij toe te voegen als collaborator.(Mijn github:HilalIntec)
+
+We beginnen met het aanmaken van een database via de commando line. De naam van de database is onlinecoursedb.
+
+In IntelliJ maken we een nieuw project aan met de naam OnlineCourseSpringProject.
+
+Veel succes.
+
+---
+
+Online Course Platform API – JWT + Rollen 1.pdf
+
+Online Course Platform API – JWT + Rollen
+(Spring Boot + Spring Security + JWT + JPA + MySQL)
+
+ALGEMENE PROJECTSTRUCTUUR
+De cursisten bouwen een secure REST API met:
+• model package
+• repository package
+• service package
+• controller package
+• dto package
+• exception package
+• configuration package
+• security package (JWT, filters, security config)
+• bootstrap package (DataLoader – verplicht)
+• application.properties (MySQL + JWT config)
+• CourseApplication (main)
+
+1. Doel van het project
+De cursist bouwt een API waarin:
+• Users kunnen registreren en loggen → JWT token ontvangen
+• Er is role-based access control: ADMIN, INSTRUCTOR, STUDENT
+• Course ↔ Enrollment relaties correct werken
+• Elke entiteit timestamps heeft (createdAt, updatedAt)
+• Database wordt gevuld via DataLoader
+• Alles getest wordt via Postman (incl. Authorization header)
+
+2. Rollen & Autorisatiematrix (VERPLICHT)
+Actie                       Visitor Student Instructor  Admin
+Register / Login            V
+Alle courses bekijken       V       S       I           A
+Course aanmaken                             I           A
+Course updaten (eigen)                      I(own)      A
+Course verwijderen                                      A
+Student inschrijven (self)          S                   A
+Inschr bekijken                     S(self) I(own)      A
+Users beheren                                           A
+Belangrijk: “(self)” betekent: enkel eigen gegevens.
+
+3. Model (Cursisten maken deze zelf)
+
+A) AuditModel (verplicht)
+(identiek principe als in vorige voorbeeld)
+
+B) User
+Velden:
+• id, username (unique), email (unique), password
+• role (enum: ADMIN, INSTRUCTOR, STUDENT)
+• timestamps via AuditModel
+
+C) Course
+Velden:• id, title, description, instructor (User), createdAt, updatedAt
+D) Enrollment
+Velden:
+• id, student (User), course, enrollmentDate
+
+4. TE MAKEN DOOR CURSISTEN
+
+A) Repository-laag
+• UserRepository
+• CourseRepository
+• EnrollmentRepository
+
+B) DTO-laag (verplicht)
+Maak minimaal:
+• RegisterRequest
+• LoginRequest
+• AuthResponse (token + user info)
+• CourseRequest / CourseResponse
+• EnrollmentResponse
+Opmerking: Password nooit teruggeven in responses.
+
+C) Service-laag
+
+AuthService
+• Register user (password hash)
+• Login (validatie + JWT genereren)UserService (admin)
+• Get all users
+• Change role
+• Delete user
+
+CourseService
+• Create course (instructor/admin)
+• Update course (instructor alleen eigen course)
+• Delete course (admin)
+• List courses (public)
+
+EnrollmentService
+• Enroll student in course (student self of admin)
+• List enrollments:
+    o student ziet alleen eigen
+    o instructor ziet enrollments van eigen courses
+    o admin ziet alles
+• Cancel enrollment (student self of admin)
+
+D) Controller-laag
+
+AuthController (public)
+Methode Endpoint
+POST    /api/auth/register
+POST    /api/auth/login
+
+CourseController
+Methode Endpoint            Auth
+GET     /api/courses        public
+GET     /api/courses/{id}   public
+POST    /api/courses        INSTRUCTOR/ADMIN
+PUT     /api/courses/{id}   INSTRUCTOR (own) / ADMIN
+DELETE  /api/courses/{id}   ADMIN
+
+EnrollmentController
+Methode Endpoint Auth
+POST    /api/courses/{id}/enroll    STUDENT/ADMIN
+GET     /api/enrollments/me         STUDENT
+GET     /api/instructor/enrollments INSTRUCTOR
+GET     /api/admin/enrollments      ADMIN
+DELETE /api/enrollments/{id}        STUDENT (self) / ADMIN
+
+AdminController (admin only)
+Methode Endpoint
+GET     /api/admin/users
+PUT     /api/admin/users/{id}/role
+DELETE  /api/admin/users/{id}
+
+5. Security package (VERPLICHT)
+
+Vereisten
+1. Password hashing met BCrypt
+2. JWT token genereren met claims: sub (username) en role
+3. JwtAuthFilter (OncePerRequestFilter)
+4. Stateless session policy
+5. CORS configuratie voor frontend (bv. http://localhost:5173)
+6. Endpoints beveiligen volgens autorisatiematrix
+7. @PreAuthorize of security rules gebruiken voor rolchecks6.
+
+Exception Handling (VERPLICHT)
+• ResourceNotFoundException
+• UnauthorizedActionException
+• DuplicateEnrollmentException
+• GlobalExceptionHandler met nette JSON errors
+
+7. BOOTSTRAP – DataLoader (VERPLICHT)
+
+Vereisten
+1. Seed data bij opstarten, enkel als DB leeg is
+2. Maak minimaal:
+a. 1 ADMIN
+b. 2 INSTRUCTORS
+c. 3 STUDENTS
+d. 3 COURSES (gekoppeld aan instructors)
+e. 3–5 ENROLLMENTS
+3. Passwords worden gehashed (via PasswordEncoder)
+4. Alles moet correct opgeslagen zijn met relaties
+8. application.properties (VERPLICHT)
+• MySQL config
+• JPA config
+• JWT secret via environment variable (bonuspunten)
+Voorbeeld:
+jwt.secret=${JWT_SECRET}
+jwt.expiration-hours=24
+
+9. Postman Collectie (VERPLICHT)
+
+Cursisten leveren een Postman collectie met:
+• Register + login (token krijgen)
+• Course create/update/delete volgens rollen
+• Enrollment acties volgens rollen• Admin user management
+• Tests met Authorization header:
+    o Authorization: Bearer <token>
+
+10. SQL Dump (VERPLICHT)
+• SQL export van MySQL database
+• Bewijs van tabellen + relaties
+
+RESULTAAT
+De cursist levert:
+✔ Secure API met JWT + rollen
+✔ MySQL database + relaties
+✔ DataLoader seed data
+✔ Postman collectie (export)
+✔ SQL dump
+✔ Geen fouten + correcte authorisatie
+
+Extra (optioneel – voor “excellente score”)
+• Refresh tokens
+• Pagination + sorting voor courses
+• Swagger/OpenAPI docs
+• Unit tests voor services
+
+Veel succes.
