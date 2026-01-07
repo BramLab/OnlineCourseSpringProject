@@ -3,7 +3,9 @@ package org.intecbrussel.onlinecoursespringproject.service;
 import jakarta.transaction.Transactional;
 import org.intecbrussel.onlinecoursespringproject.dto.UserCreateDto;
 import org.intecbrussel.onlinecoursespringproject.dto.UserResponseDto;
+import org.intecbrussel.onlinecoursespringproject.exception.NotFoundException;
 import org.intecbrussel.onlinecoursespringproject.model.Role;
+import org.intecbrussel.onlinecoursespringproject.model.User;
 import org.intecbrussel.onlinecoursespringproject.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -44,11 +46,18 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public UserResponseDto updateUser(Long id, UserCreateDto userCreateDto) {
-        return null;
+        User user = userRepository.findById(id)
+                .orElseThrow(() ->
+                        new NotFoundException("User not found with id: " + id));
+
+        applyUpdates(user, dto);
+
+        User updatedUser = userRepository.save(user);
+        return UserMapper.mapToUserDTO(updatedUser);
     }
 
     @Override
     public void deleteUser(Long id) {
-
+        userRepository.deleteById(id);
     }
 }
