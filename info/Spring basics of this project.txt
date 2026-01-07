@@ -1,0 +1,152 @@
+Startup steps:
+https://medium.com/@aravindcsebe/understanding-spring-boot-bootstrap-a-complete-journey-from-start-to-ready-5c192ad2f52b
+
+1) Application Setup — Preparing the SpringApplication
+In static void main: what kind of application?
+    Spring Boot looks at your classpath to determine if it’s a web application
+    It identifies what type of web server to use (Tomcat, Jetty, etc.)
+    It prepares listeners to track the startup process
+    It finds your main class for reference
+
+2) Environment Loading — Reading configuration files
+    Reads configuration files and properties.
+    # 1. Command line arguments
+        java -jar myapp.jar --server.port=8080
+    # 2. application-{profile}.properties
+        # application-dev.properties, application-prod.properties
+    # 3. application.properties
+        server.port=8080
+        spring.profiles.active=dev
+    # 4. System environment variables
+        export SERVER_PORT=8080
+
+3) Context Creation — Building the Spring container
+    The ApplicationContext is like the “container” that will hold all your application components.
+
+    // Spring creates something like this internally
+    ApplicationContext context = new SpringApplicationContext();
+    context.setEnvironment(loadedProperties);
+    context.setClassLoader(currentClassLoader);
+
+    What this means:
+        Creates a container to store your beans (objects)
+        Links it to the configuration you loaded
+        Prepares it to scan for your components
+
+4) Component Discovery — Finding your classes and services
+Spring Boot scans your code to find classes it should manage.
+What Gets Scanned?
+    @Component
+    public class EmailService {
+        // Spring will create and manage this
+    }
+    @Service
+    public class UserService {
+        // Spring will create and manage this
+    }
+    @Controller
+    public class UserController {
+        // Spring will create and manage this
+    }
+    @Repository
+    public class UserRepository {
+        // Spring will create and manage this
+    }
+    @Configuration
+    public class DatabaseConfig {
+        // Spring will use this for configuration
+        @Bean
+        public DataSource dataSource() {
+            // Spring will create this bean
+            return new HikariDataSource();
+        }
+    }
+Scanning Rules:
+    By default, scans the package of your main class and all sub-packages
+    Only creates objects for classes with Spring annotations
+    Registers bean definitions (recipes for creating objects) but doesn’t create them yet
+
+Simple Example:
+    // If your main class is here:
+    com.mycompany.myapp.Application
+
+    // Spring scans these packages:
+    com.mycompany.myapp.*
+    com.mycompany.myapp.service.*
+    com.mycompany.myapp.controller.*
+    // etc.
+
+5) Bean Creation — Instantiating objects and wiring dependencies
+    Now Spring creates actual objects and connects them together.
+
+    The Creation Process:
+        Create UserRepository (no dependencies)
+        Create EmailService (no dependencies)
+        Create UserService (inject UserRepository and EmailService)
+    Important: Spring automatically figures out the creation order based on dependencies.
+
+6) Auto-Configuration — Setting up framework features automatically
+    Automatically configures common features.
+    Mainly (1) you do pom.xml and (2) Spring automatically provides beans, managers, repositories,
+
+    e.g.:
+    // (1) You just add this dependency in pom.xml:
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+
+    // (2) Spring Boot automatically provides:
+    // - DataSource bean
+    // - EntityManager
+    // - Transaction manager
+    // - JPA repositories
+
+7) Server Start — Starting the web server (if it’s a web app)
+    Server Selection Logic:
+
+    // Spring Boot checks your dependencies:
+    // If you have spring-boot-starter-web: -> Starts Tomcat on port 8080
+    // If you have spring-boot-starter-webflux: -> Starts Netty for reactive applications
+    // If you have spring-boot-starter (no web): -> No server started, regular application
+
+    Server Configuration:
+    # application.properties
+    server.port=9090
+    server.servlet.context-path=/api
+    server.tomcat.max-threads=200
+
+8) Application Ready — Final setup and ready to serve
+
+    Startup Runners Example:
+        @Component
+        public class DataInitializer implements ApplicationRunner {
+            @Autowired
+            private UserService userService;
+            @Override
+            public void run(ApplicationArguments args) throws Exception {
+                // This runs after everything is ready
+                System.out.println("Application started successfully!");
+
+                // Initialize some data if needed
+                if (userService.countUsers() == 0) {
+                    userService.createDefaultUsers();
+                }
+            }
+        }
+
+    Application Events:
+        @Component
+        public class StartupListener {
+            @EventListener
+            public void handleApplicationReady(ApplicationReadyEvent event) {
+                System.out.println("🚀 Application is ready to serve requests!");
+            }
+            @EventListener
+            public void handleContextRefresh(ContextRefreshedEvent event) {
+                System.out.println("✅ Spring context loaded successfully!");
+            }
+        }
+
+---
+
