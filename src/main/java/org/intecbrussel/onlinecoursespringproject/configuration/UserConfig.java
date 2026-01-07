@@ -8,7 +8,6 @@ import org.intecbrussel.onlinecoursespringproject.repository.CourseRepository;
 import org.intecbrussel.onlinecoursespringproject.repository.EnrollmentRepository;
 import org.intecbrussel.onlinecoursespringproject.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
@@ -17,7 +16,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Date;
-import java.time.LocalDate;
 import java.util.Base64;
 
 //@SpringBootApplication = @Configuration, @EnableAutoConfiguration and @ComponentScan
@@ -26,7 +24,7 @@ import java.util.Base64;
 public class UserConfig {
 
     @Bean
-    CommandLineRunner commandLineRunner(UserRepository userRepository, CourseRepository courseRepository, EnrollmentRepository enrollmentRepository) {
+    CommandLineRunner dataLoader_commandLineRunner(UserRepository userRepository, CourseRepository courseRepository, EnrollmentRepository enrollmentRepository) {
         return args -> {
 
             User user_instructor1 = new User();
