@@ -1,30 +1,28 @@
 package org.intecbrussel.onlinecoursespringproject.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @EqualsAndHashCode(callSuper = true)
-@NoArgsConstructor
+//@NoArgsConstructor
 @AllArgsConstructor
 @Data //Combines @Getter, @Setter, @ToString, @EqualsAndHashCode, @RequiredArgsConstructor
 @Entity
-public class Course extends AuditModel {
+@NoArgsConstructor
+public class Enrollment extends AuditModel{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long  id;
-
-    private String title;
-    private String description;
+    private long id;
 
     @ManyToOne
-    private User instructor;
+    private User student;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date startDate;
+    @ManyToOne
+    private Course course;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date endDate;
 }

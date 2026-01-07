@@ -1,35 +1,71 @@
 package org.intecbrussel.onlinecoursespringproject.configuration;
 
+import org.intecbrussel.onlinecoursespringproject.model.Course;
+import org.intecbrussel.onlinecoursespringproject.model.Enrollment;
 import org.intecbrussel.onlinecoursespringproject.model.Role;
 import org.intecbrussel.onlinecoursespringproject.model.User;
+import org.intecbrussel.onlinecoursespringproject.repository.CourseRepository;
+import org.intecbrussel.onlinecoursespringproject.repository.EnrollmentRepository;
 import org.intecbrussel.onlinecoursespringproject.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.Base64;
 
 //@SpringBootApplication = @Configuration, @EnableAutoConfiguration and @ComponentScan
 @Configuration
+@EnableJpaAuditing
 public class UserConfig {
 
     @Bean
-    CommandLineRunner commandLineRunner(UserRepository userRepository) {
+    CommandLineRunner commandLineRunner(UserRepository userRepository, CourseRepository courseRepository, EnrollmentRepository enrollmentRepository) {
         return args -> {
-            User instr1 = new User();
-            instr1.setUserName("user1");
-            instr1.setEmail("user1@c.com");
-            instr1.setRole(Role.INSTRUCTOR);
-            instr1.setPasswordHashed(clearTextToSHA256HashToBase64("1234"));
-            userRepository.save(instr1);
 
-            User instr2 = new User(0, "user2", "user2@c.com", Role.INSTRUCTOR
-                    , clearTextToSHA256HashToBase64("5678"));
-            userRepository.save(instr2);
+            User user_instructor1 = new User();
+            user_instructor1.setUserName("user_instructor1");
+            user_instructor1.setEmail("user_instructor1@c.com");
+            user_instructor1.setRole(Role.INSTRUCTOR);
+            user_instructor1.setPasswordHashed(clearTextToSHA256HashToBase64("i1"));
+            userRepository.save(user_instructor1);
+
+            User user_instructor2 = new User(0, "user_instructor2", "user_instructor2@c.com", Role.INSTRUCTOR
+                    , clearTextToSHA256HashToBase64("i2"));
+            userRepository.save(user_instructor2);
+
+            User user_student1 = new User(0, "user_student1", "user_student1@c.com", Role.STUDENT
+                    , clearTextToSHA256HashToBase64("s1"));
+            userRepository.save(user_student1);
+
+            User user_student2 = new User(0, "user_student2", "user_student2@c.com", Role.STUDENT
+                    , clearTextToSHA256HashToBase64("s2"));
+            userRepository.save(user_student2);
+
+            User user_admin1 = new User(0, "user_admin1", "user_admin1@c.com", Role.ADMIN
+                    , clearTextToSHA256HashToBase64("a1"));
+            userRepository.save(user_admin1);
+
+
+            Course course_java = new Course(  0, "Java", "OOP, preparation for OCA", user_instructor1
+                    , Date.valueOf("2026-04-01"), Date.valueOf("2026-09-01")  );
+            courseRepository.save(course_java);
+            Course course_tws = new Course(0, "Tws", "cv, brief, solliciteren", user_instructor2,
+                    Date.valueOf("2026-09-02"), Date.valueOf("2026-10-01")  );
+            courseRepository.save(course_tws);
+
+
+            Enrollment enrollment1 = new Enrollment(0, user_student1, course_java);
+            enrollmentRepository.save(enrollment1);
+            Enrollment enrollment2 = new Enrollment(0, user_student2, course_tws);
+            enrollmentRepository.save(enrollment2);
+
         };
     }
 
