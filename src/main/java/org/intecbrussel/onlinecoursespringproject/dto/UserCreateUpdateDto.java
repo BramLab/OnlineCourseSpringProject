@@ -7,6 +7,6 @@ public record UserCreateUpdateDto(
     long id,
     @NotBlank String userName,
     @NotBlank String email,
-    @NotBlank Role role,
+    Role role,
     @NotBlank String password
 ){}
