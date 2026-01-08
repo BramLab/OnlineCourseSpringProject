@@ -1,0 +1,7 @@
+package org.intecbrussel.onlinecoursespringproject.exception;
+
+public class ResourceNotFoundException extends RuntimeException {
+    public ResourceNotFoundException(String message) {
+        super("Trouble: " + message);
+    }
+}

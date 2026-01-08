@@ -11,6 +11,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -24,30 +25,34 @@ import java.util.Base64;
 public class UserConfig {
 
     @Bean
-    CommandLineRunner dataLoader_commandLineRunner(UserRepository userRepository, CourseRepository courseRepository, EnrollmentRepository enrollmentRepository) {
+    CommandLineRunner dataLoader_commandLineRunner(UserRepository userRepository,
+                                                   CourseRepository courseRepository,
+                                                   EnrollmentRepository enrollmentRepository,
+                                                   PasswordEncoder passwordEncoder) {
         return args -> {
 
             User user_instructor1 = new User();
             user_instructor1.setUserName("user_instructor1");
             user_instructor1.setEmail("user_instructor1@c.com");
             user_instructor1.setRole(Role.INSTRUCTOR);
-            user_instructor1.setPasswordHashed(clearTextToSHA256HashToBase64("i1"));
+            user_instructor1.setPasswordHashed(passwordEncoder.encode("i1"));
+            //user_instructor1.setPasswordHashed(clearTextToSHA256HashToBase64("i1"));
             userRepository.save(user_instructor1);
 
             User user_instructor2 = new User(0, "user_instructor2", "user_instructor2@c.com", Role.INSTRUCTOR
-                    , clearTextToSHA256HashToBase64("i2"));
+                    , passwordEncoder.encode("i2"));    //, clearTextToSHA256HashToBase64("i2"));
             userRepository.save(user_instructor2);
 
             User user_student1 = new User(0, "user_student1", "user_student1@c.com", Role.STUDENT
-                    , clearTextToSHA256HashToBase64("s1"));
+                    , passwordEncoder.encode("s1"));
             userRepository.save(user_student1);
 
             User user_student2 = new User(0, "user_student2", "user_student2@c.com", Role.STUDENT
-                    , clearTextToSHA256HashToBase64("s2"));
+                    , passwordEncoder.encode("s1"));
             userRepository.save(user_student2);
 
             User user_admin1 = new User(0, "user_admin1", "user_admin1@c.com", Role.ADMIN
-                    , clearTextToSHA256HashToBase64("a1"));
+                    , passwordEncoder.encode("a1"));
             userRepository.save(user_admin1);
 
 
