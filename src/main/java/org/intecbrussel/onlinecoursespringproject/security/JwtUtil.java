@@ -16,7 +16,7 @@ import java.util.Date;
 
 @Service
 public class JwtUtil {
-    private static final String SECRET = "123";// + ""f36d2dcedfcb3b9c2ba772668c86a46371d8a2446e2f78a47adc369a490a9d6e";
+    private static final String SECRET = "f36d2dcedfcb3b9c2ba772668c86a46371d8a2446e2f78a47adc369a490a9d6e";
 
     private SecretKey getSignKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET);

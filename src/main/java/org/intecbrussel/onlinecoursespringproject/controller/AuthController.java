@@ -1,6 +1,7 @@
 package org.intecbrussel.onlinecoursespringproject.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.intecbrussel.onlinecoursespringproject.dto.LoginAuthRequest;
 import org.intecbrussel.onlinecoursespringproject.dto.LoginAuthResponse;
 import org.intecbrussel.onlinecoursespringproject.dto.RegisterRequest;
@@ -10,13 +11,10 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
-
-    public AuthController(AuthService authService) {
-        this.authService = authService;
-    }
 
     @PostMapping("/register")
     public UserResponse register(@Valid @RequestBody RegisterRequest registerRequest) {
@@ -27,13 +25,5 @@ public class AuthController {
     public LoginAuthResponse login(@Valid @RequestBody LoginAuthRequest loginAuthRequest) {
         return authService.login(loginAuthRequest);
     }
-
-//    @PutMapping("/{id}")
-//    public UserResponseDto updateEmployee(@PathVariable Long id,@RequestBody UserCreateUpdateDto userCreateUpdateDto) {
-//        if(!Objects.equals( id, userCreateUpdateDto.id() )){
-//            throw new IllegalArgumentException("IDs don't match");
-//        }
-//        return userService.updateUser(id, userCreateUpdateDto);
-//    }
 
 }
