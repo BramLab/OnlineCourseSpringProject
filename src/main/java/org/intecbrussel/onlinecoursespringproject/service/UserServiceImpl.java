@@ -1,11 +1,9 @@
 package org.intecbrussel.onlinecoursespringproject.service;
 
 import jakarta.transaction.Transactional;
-import org.intecbrussel.onlinecoursespringproject.dto.UserCreateUpdateDto;
+import org.intecbrussel.onlinecoursespringproject.dto.RegisterRequest;
 import org.intecbrussel.onlinecoursespringproject.dto.UserMapper;
-import org.intecbrussel.onlinecoursespringproject.dto.UserResponseDto;
-import org.intecbrussel.onlinecoursespringproject.exception.NotFoundException;
-import org.intecbrussel.onlinecoursespringproject.exception.ResourceNotFoundException;
+import org.intecbrussel.onlinecoursespringproject.dto.UserResponse;
 import org.intecbrussel.onlinecoursespringproject.model.Role;
 import org.intecbrussel.onlinecoursespringproject.model.User;
 import org.intecbrussel.onlinecoursespringproject.repository.UserRepository;
@@ -27,13 +25,13 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public UserResponseDto createUser(UserCreateUpdateDto userCreateUpdateDto) {
+    public UserResponse createUser(RegisterRequest registerRequest) {
         User user = new User();
-        if (userCreateUpdateDto.userName() != null) user.setUserName(userCreateUpdateDto.userName());
-        if (userCreateUpdateDto.email() != null) user.setEmail(userCreateUpdateDto.email());
-        if (userCreateUpdateDto.role() != null) user.setRole(userCreateUpdateDto.role());
-        if (userCreateUpdateDto.password() != null) {
-            user.setPasswordHashed(passwordEncoder.encode(userCreateUpdateDto.password()));
+        if (registerRequest.userName() != null) user.setUserName(registerRequest.userName());
+        if (registerRequest.email() != null) user.setEmail(registerRequest.email());
+        if (registerRequest.role() != null) user.setRole(registerRequest.role());
+        if (registerRequest.password() != null) {
+            user.setPasswordHashed(passwordEncoder.encode(registerRequest.password()));
         }
         //throw new ResourceNotFoundException("We got this far...");
         User savedUser = userRepository.save(user);
@@ -51,17 +49,17 @@ public class UserServiceImpl implements UserService{
 //    }
 
     @Override
-    public UserResponseDto getUserById(long id) {
+    public UserResponse getUserById(long id) {
         return null;
     }
 
     @Override
-    public List<UserResponseDto> getAllUsers() {
+    public List<UserResponse> getAllUsers() {
         return List.of();
     }
 
     @Override
-    public List<UserResponseDto> getUsersByRole(Role role) {
+    public List<UserResponse> getUsersByRole(Role role) {
         return List.of();
     }
 

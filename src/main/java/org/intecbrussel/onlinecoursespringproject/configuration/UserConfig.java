@@ -73,11 +73,11 @@ public class UserConfig {
     }
 
     //Base64 encoded SHA-256 hash
-    public static String clearTextToSHA256HashToBase64(final String clearText) throws NoSuchAlgorithmException {
-        byte[] clearTextBytes = clearText.getBytes(StandardCharsets.UTF_8);
-        MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-        byte[] digestedMessage = messageDigest.digest(clearTextBytes);
-        return new String( Base64.getEncoder().encode(digestedMessage));
-    }
+//    public static String clearTextToSHA256HashToBase64(final String clearText) throws NoSuchAlgorithmException {
+//        byte[] clearTextBytes = clearText.getBytes(StandardCharsets.UTF_8);
+//        MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+//        byte[] digestedMessage = messageDigest.digest(clearTextBytes);
+//        return new String( Base64.getEncoder().encode(digestedMessage));
+//    }
 
 }

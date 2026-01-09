@@ -1,4 +1,4 @@
-package org.intecbrussel.onlinecoursespringproject.bootstrap;
+package org.intecbrussel.onlinecoursespringproject.configuration;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -7,12 +7,16 @@ import java.util.Scanner;
 
 public class MakeDatabase {
     public static void main(String[] args) {
-        System.out.print("Wachtwoord voor root user: ");
+        String dbName = "onlinecoursedb";
+        System.out.print("Deze functie overschrijft of maakt database " + dbName + " aan." +
+                "\n(En linkt die aan bestaande user intec.)" +
+                "\nBEN JE ZEKER?");
+                System.out.print("\nWachtwoord voor root user: ");
         Scanner sc=new Scanner(System.in);
         String password = sc.nextLine();
         try(Connection connection = DriverManager.getConnection("jdbc:mysql://localhost/?user=root&password=" +  password);
             Statement statement=connection.createStatement();  ){
-            String dbName = "onlinecoursedb";
+
             System.out.println(statement.executeUpdate("DROP DATABASE IF EXISTS " + dbName));
             System.out.println (statement.executeUpdate("CREATE DATABASE " + dbName) );
             System.out.println( statement.executeUpdate("grant all on " + dbName + ".* to 'intec'@'localhost'") );

@@ -4,8 +4,8 @@ import org.intecbrussel.onlinecoursespringproject.model.User;
 
 public class UserMapper {
 
-    public static UserResponseDto mapToUserDTO(User user) {
-        return new UserResponseDto(
+    public static UserResponse mapToUserDTO(User user) {
+        return new UserResponse(
                 user.getId(),
                 user.getUserName(),
                 user.getEmail(),

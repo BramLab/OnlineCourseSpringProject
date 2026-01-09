@@ -1,3 +1,10 @@
+
+
+CORS: Cross-Origin Resource Sharing (CORS)
+
+
+
+
 Startup steps:
 https://medium.com/@aravindcsebe/understanding-spring-boot-bootstrap-a-complete-journey-from-start-to-ready-5c192ad2f52b
 

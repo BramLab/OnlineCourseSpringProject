@@ -1,12 +1,10 @@
 package org.intecbrussel.onlinecoursespringproject.controller;
 
 import jakarta.validation.Valid;
-import org.intecbrussel.onlinecoursespringproject.dto.UserCreateUpdateDto;
-import org.intecbrussel.onlinecoursespringproject.dto.UserResponseDto;
+import org.intecbrussel.onlinecoursespringproject.dto.RegisterRequest;
+import org.intecbrussel.onlinecoursespringproject.dto.UserResponse;
 import org.intecbrussel.onlinecoursespringproject.service.UserService;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -20,8 +18,8 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public UserResponseDto saveEmployee(@Valid @RequestBody UserCreateUpdateDto userCreateUpdateDto) {
-        return userService.createUser(userCreateUpdateDto);
+    public UserResponse saveEmployee(@Valid @RequestBody RegisterRequest registerRequest) {
+        return userService.createUser(registerRequest);
     }
 
 //    @PutMapping("/{id}")
