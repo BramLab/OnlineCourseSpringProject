@@ -1,12 +1,20 @@
 package org.intecbrussel.onlinecoursespringproject.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.intecbrussel.onlinecoursespringproject.model.Role;
 
 public record RegisterRequest(
     long id,
-    @NotBlank String userName,
-    @NotBlank String email,
+    @NotBlank(message = "Username is required")
+    String userName,
+
+    @NotBlank(message = "Email is required")
+    String email,
+
+    @NotNull(message = "Role is required")
     Role role,
-    @NotBlank String password
+
+    @NotBlank(message = "Password is required")
+    String password
 ){}

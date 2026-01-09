@@ -16,7 +16,7 @@ public class User extends AuditModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private String userName;
+    private String username;
     private String email;
     private Role role;
     private String passwordHashed;

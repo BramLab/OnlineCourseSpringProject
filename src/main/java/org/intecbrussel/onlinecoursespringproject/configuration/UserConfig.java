@@ -13,11 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Date;
-import java.util.Base64;
 
 //@SpringBootApplication = @Configuration, @EnableAutoConfiguration and @ComponentScan
 @Configuration
@@ -32,7 +28,7 @@ public class UserConfig {
         return args -> {
 
             User user_instructor1 = new User();
-            user_instructor1.setUserName("user_instructor1");
+            user_instructor1.setUsername("user_instructor1");
             user_instructor1.setEmail("user_instructor1@c.com");
             user_instructor1.setRole(Role.INSTRUCTOR);
             user_instructor1.setPasswordHashed(passwordEncoder.encode("i1"));

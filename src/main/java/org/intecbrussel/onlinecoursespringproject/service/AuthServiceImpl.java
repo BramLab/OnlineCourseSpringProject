@@ -1,10 +1,9 @@
 package org.intecbrussel.onlinecoursespringproject.service;
 
 import jakarta.transaction.Transactional;
-import org.intecbrussel.onlinecoursespringproject.dto.RegisterRequest;
-import org.intecbrussel.onlinecoursespringproject.dto.UserMapper;
-import org.intecbrussel.onlinecoursespringproject.dto.UserResponse;
-import org.intecbrussel.onlinecoursespringproject.model.Role;
+import org.intecbrussel.onlinecoursespringproject.dto.*;
+import org.intecbrussel.onlinecoursespringproject.exception.DuplicateEnrollmentException;
+import org.intecbrussel.onlinecoursespringproject.exception.ResourceNotFoundException;
 import org.intecbrussel.onlinecoursespringproject.model.User;
 import org.intecbrussel.onlinecoursespringproject.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,42 +13,38 @@ import java.util.List;
 
 @Service
 @Transactional
-public class UserServiceImpl implements UserService{
+public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Override
-    public UserResponse createUser(RegisterRequest registerRequest) {
+    public UserResponse registerUser(RegisterRequest registerRequest) {
         User user = new User();
-        if (registerRequest.userName() != null) user.setUserName(registerRequest.userName());
+        if (registerRequest.userName() != null) user.setUsername(registerRequest.userName());
+        User similarOriginalUser = userRepository.findByUsername(registerRequest.userName())
+                .ifPresentOrElse((u) -> {
+                    throw new DuplicateEnrollmentException("Username already exists.");
+                }, ()->{;});
+
         if (registerRequest.email() != null) user.setEmail(registerRequest.email());
+        // todo check email exists
         if (registerRequest.role() != null) user.setRole(registerRequest.role());
         if (registerRequest.password() != null) {
             user.setPasswordHashed(passwordEncoder.encode(registerRequest.password()));
         }
-        //throw new ResourceNotFoundException("We got this far...");
+
         User savedUser = userRepository.save(user);
         return UserMapper.mapToUserDTO(savedUser);
     }
 
-//    @Override
-//    public UserResponseDto updateUser(Long id, UserCreateUpdateDto userCreateUpdateDto) {
-//        User user = userRepository.findById(id)
-//                .orElseThrow(() ->
-//                        new NotFoundException("User not found with id: " + id));
-//        UserCreateUpdateDtoToUser(userCreateUpdateDto, user);
-//        User updatedUser = userRepository.save(user);
-//        return UserMapper.mapToUserDTO(updatedUser);
-//    }
-
     @Override
-    public UserResponse getUserById(long id) {
+    public LoginAuthResponse login(LoginAuthRequest loginAuthRequest) {
         return null;
     }
 
@@ -59,12 +54,17 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public List<UserResponse> getUsersByRole(Role role) {
-        return List.of();
+    public UserResponse updateUserChangeRole(Long id, UserChangeRoleRequest userChangeRoleRequest) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+        user.setRole(userChangeRoleRequest.role());
+        User updatedUser = userRepository.save(user);
+        return UserMapper.mapToUserDTO(updatedUser);
     }
 
     @Override
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
+
 }

@@ -7,7 +7,7 @@ public class UserMapper {
     public static UserResponse mapToUserDTO(User user) {
         return new UserResponse(
                 user.getId(),
-                user.getUserName(),
+                user.getUsername(),
                 user.getEmail(),
                 user.getRole()
         );
