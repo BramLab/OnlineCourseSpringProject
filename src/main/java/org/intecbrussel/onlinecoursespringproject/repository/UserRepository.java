@@ -1,5 +1,6 @@
 package org.intecbrussel.onlinecoursespringproject.repository;
 
+import jakarta.validation.constraints.NotBlank;
 import org.intecbrussel.onlinecoursespringproject.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -17,4 +18,6 @@ public interface UserRepository extends JpaRepository<User,Long> {
     // instead of writing boilerplate queries.
     Optional<User> findByUsername(String username);
 
+    Optional<Object> findByEmail(String email);
 }
+

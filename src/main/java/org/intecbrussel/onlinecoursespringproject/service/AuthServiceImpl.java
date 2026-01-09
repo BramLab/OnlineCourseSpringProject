@@ -1,56 +1,89 @@
 package org.intecbrussel.onlinecoursespringproject.service;
 
+import lombok.RequiredArgsConstructor;
+import org.intecbrussel.onlinecoursespringproject.model.Role;
+import org.intecbrussel.onlinecoursespringproject.security.JwtUtil;
+import io.jsonwebtoken.Jwt;
+import io.jsonwebtoken.Jwts;
 import jakarta.transaction.Transactional;
 import org.intecbrussel.onlinecoursespringproject.dto.*;
 import org.intecbrussel.onlinecoursespringproject.exception.DuplicateEnrollmentException;
+import org.intecbrussel.onlinecoursespringproject.exception.MissingDataException;
 import org.intecbrussel.onlinecoursespringproject.exception.ResourceNotFoundException;
 import org.intecbrussel.onlinecoursespringproject.model.User;
 import org.intecbrussel.onlinecoursespringproject.repository.UserRepository;
+import org.springframework.security.core.token.Token;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
-    public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+    // replaced by @RequiredArgsConstructor
+//    public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+//        this.userRepository = userRepository;
+//        this.passwordEncoder = passwordEncoder;
+//        this.jwtUtil = jwtUtil;
+//    }
 
     @Override
     public UserResponse registerUser(RegisterRequest registerRequest) {
-        User user = new User();
-        if (registerRequest.userName() != null) user.setUsername(registerRequest.userName());
-        User similarOriginalUser = userRepository.findByUsername(registerRequest.userName())
-                .ifPresentOrElse((u) -> {
-                    throw new DuplicateEnrollmentException("Username already exists.");
-                }, ()->{;});
+        User newUser = new User();
 
-        if (registerRequest.email() != null) user.setEmail(registerRequest.email());
-        // todo check email exists
-        if (registerRequest.role() != null) user.setRole(registerRequest.role());
-        if (registerRequest.password() != null) {
-            user.setPasswordHashed(passwordEncoder.encode(registerRequest.password()));
+        if (registerRequest.userName().isBlank()) {
+            throw new MissingDataException("Username is required");
+        } else if (userRepository.findByUsername(registerRequest.userName()).isPresent()) {
+                throw new DuplicateEnrollmentException("Username already exists.");
+        } else{ newUser.setUsername(registerRequest.userName()); }
+
+        if (registerRequest.email().isBlank()){
+            throw new MissingDataException("Email is required");
+        } else if (userRepository.findByEmail(registerRequest.email()).isPresent()) {
+            throw new DuplicateEnrollmentException("Email already exists.");
+        } else { newUser.setEmail(registerRequest.email()); }
+
+        if (registerRequest.role() == null){
+            throw new MissingDataException("Role is required");
+        } else { newUser.setRole(registerRequest.role()); }
+
+        if (registerRequest.password()==null || registerRequest.password().length() < 8) {
+            throw new MissingDataException("Password is required and should be at least 8 characters long");
+        } else {
+            newUser.setPasswordHashed(passwordEncoder.encode(registerRequest.password()));
         }
 
-        User savedUser = userRepository.save(user);
-        return UserMapper.mapToUserDTO(savedUser);
+        User createdUser = userRepository.save(newUser);
+        return UserMapper.mapToUserResponse(createdUser);
     }
 
     @Override
     public LoginAuthResponse login(LoginAuthRequest loginAuthRequest) {
-        return null;
+        Optional<User> optionalUser = userRepository.findByUsername(loginAuthRequest.username());
+        if (optionalUser.isEmpty()) {
+            throw new ResourceNotFoundException("Username not found.");
+        }
+        User user = optionalUser.get();
+
+        var jwtToken = jwtUtil.generateToken(user.getUsername(), user.getRole().name());
+        return new LoginAuthResponse(user.getId(), user.getUsername(), user.getEmail(), user.getRole(), jwtToken);
     }
 
     @Override
     public List<UserResponse> getAllUsers() {
-        return List.of();
+        return userRepository.findAll()
+                .stream()
+                .map(u -> UserMapper.mapToUserResponse(u))
+                //.map(UserMapper::mapToUserResponse) //method reference not intuitive yet
+                .toList();
     }
 
     @Override
@@ -59,7 +92,7 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
         user.setRole(userChangeRoleRequest.role());
         User updatedUser = userRepository.save(user);
-        return UserMapper.mapToUserDTO(updatedUser);
+        return UserMapper.mapToUserResponse(updatedUser);
     }
 
     @Override
