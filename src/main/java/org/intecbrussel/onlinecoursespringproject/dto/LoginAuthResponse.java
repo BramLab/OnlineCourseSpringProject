@@ -8,5 +8,5 @@ public record LoginAuthResponse(
         String userName,
         String email,
         Role role,
-        Token token
+        String token
 ) {}

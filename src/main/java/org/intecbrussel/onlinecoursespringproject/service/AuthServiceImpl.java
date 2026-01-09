@@ -60,7 +60,6 @@ public class AuthServiceImpl implements AuthService {
         } else {
             newUser.setPasswordHashed(passwordEncoder.encode(registerRequest.password()));
         }
-
         User createdUser = userRepository.save(newUser);
         return UserMapper.mapToUserResponse(createdUser);
     }
@@ -69,12 +68,12 @@ public class AuthServiceImpl implements AuthService {
     public LoginAuthResponse login(LoginAuthRequest loginAuthRequest) {
         Optional<User> optionalUser = userRepository.findByUsername(loginAuthRequest.username());
         if (optionalUser.isEmpty()) {
-            throw new ResourceNotFoundException("Username not found.");
+            throw new ResourceNotFoundException("Username not found. Are you registered?");
         }
         User user = optionalUser.get();
-
-        var jwtToken = jwtUtil.generateToken(user.getUsername(), user.getRole().name());
-        return new LoginAuthResponse(user.getId(), user.getUsername(), user.getEmail(), user.getRole(), jwtToken);
+        String jwtToken = jwtUtil.generateToken(user.getUsername(), user.getRole().name());
+        return new LoginAuthResponse(user.getId(), user.getUsername(), user.getEmail(),
+                user.getRole(), jwtToken);
     }
 
     @Override

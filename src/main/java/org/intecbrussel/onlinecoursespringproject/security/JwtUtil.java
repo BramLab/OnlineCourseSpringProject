@@ -16,7 +16,7 @@ import java.util.Date;
 
 @Service
 public class JwtUtil {
-    private static final String SECRET = "f36d2dcedfcb3b9c2ba772668c86a46371d8a2446e2f78a47adc369a490a9d6e";
+    private static final String SECRET = "123";// + ""f36d2dcedfcb3b9c2ba772668c86a46371d8a2446e2f78a47adc369a490a9d6e";
 
     private SecretKey getSignKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET);
@@ -26,39 +26,9 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String extractUsername(String token) {
-        return extractAllClaims(token).getSubject();
-    }
-
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        return extractUsername(token).equals(userDetails.getUsername())
-                && !isTokenExpired(token);
-    }
-
-    private boolean isTokenExpired(String token) {
-        Date exp = extractAllClaims(token).getExpiration();
-        return exp != null && exp.before(new Date());
-    }
-
-
-    private Claims extractAllClaims(String token) {
-        try {
-            Jwt<?, Claims> jwt = Jwts
-                    .parser()
-                    .verifyWith(getSignKey())
-                    .build()
-                    .parseSignedClaims(token);
-            return jwt.getPayload();
-        } catch (RuntimeException e) {
-            throw new RuntimeException("Invalid JWT signature", e);
-        }
-    }
-
-
     public String generateToken(String username, String role) {
         Instant now = Instant.now();
-        Instant expire = now.plus(24, ChronoUnit.HOURS);
-
+        Instant expire = now.plus(5, ChronoUnit.MINUTES);
         return Jwts.builder()
                 .subject(username)
                 .claim("role", role)
@@ -67,4 +37,35 @@ public class JwtUtil {
                 .signWith(getSignKey())
                 .compact();
     }
+
+//    public String extractUsername(String token) {
+//        return extractAllClaims(token).getSubject();
+//    }
+
+//    public boolean isTokenValid(String token, UserDetails userDetails) {
+//        return extractUsername(token).equals(userDetails.getUsername())
+//                && !isTokenExpired(token);
+//    }
+
+//    private boolean isTokenExpired(String token) {
+//        Date exp = extractAllClaims(token).getExpiration();
+//        return exp != null && exp.before(new Date());
+//    }
+
+
+//    private Claims extractAllClaims(String token) {
+//        try {
+//            Jwt<?, Claims> jwt = Jwts
+//                    .parser()
+//                    .verifyWith(getSignKey())
+//                    .build()
+//                    .parseSignedClaims(token);
+//            return jwt.getPayload();
+//        } catch (RuntimeException e) {
+//            throw new RuntimeException("Invalid JWT signature", e);
+//        }
+//    }
+
+
+
 }
