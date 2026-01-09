@@ -1,4 +1,4 @@
-package org.intecbrussel.onlinecoursespringproject.configuration;
+package org.intecbrussel.onlinecoursespringproject.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +21,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for testing
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll() // Allow public access to auth endpoints
+                        //.requestMatchers("/api/admin/**").permitAll() // TEMPORARY - for testing only
                         .anyRequest().authenticated() // Require authentication for other endpoints
                 );
 
