@@ -1,5 +1,6 @@
 Option 2: Proper Solution - Implement JWT Authentication (Required for your assignment)
 Your assignment requires JWT authentication and role-based authorization. You need to implement:
+
 Step 1: Create JwtAuthenticationFilter
 Create a new file src/main/java/org/intecbrussel/onlinecoursespringproject/security/JwtAuthenticationFilter.java:
 

@@ -28,7 +28,7 @@ public class JwtUtil {
 
     public String generateToken(String username, String role) {
         Instant now = Instant.now();
-        Instant expire = now.plus(5, ChronoUnit.MINUTES);
+        Instant expire = now.plus(20, ChronoUnit.MINUTES);
         return Jwts.builder()
                 .subject(username)
                 .claim("role", role)
@@ -38,34 +38,31 @@ public class JwtUtil {
                 .compact();
     }
 
-//    public String extractUsername(String token) {
-//        return extractAllClaims(token).getSubject();
-//    }
+    public String extractUsername(String token) {
+        return extractAllClaims(token).getSubject();
+    }
 
-//    public boolean isTokenValid(String token, UserDetails userDetails) {
-//        return extractUsername(token).equals(userDetails.getUsername())
-//                && !isTokenExpired(token);
-//    }
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        return extractUsername(token).equals(userDetails.getUsername())
+                && !isTokenExpired(token);
+    }
 
-//    private boolean isTokenExpired(String token) {
-//        Date exp = extractAllClaims(token).getExpiration();
-//        return exp != null && exp.before(new Date());
-//    }
+    private boolean isTokenExpired(String token) {
+        Date exp = extractAllClaims(token).getExpiration();
+        return exp != null && exp.before(new Date());
+    }
 
-
-//    private Claims extractAllClaims(String token) {
-//        try {
-//            Jwt<?, Claims> jwt = Jwts
-//                    .parser()
-//                    .verifyWith(getSignKey())
-//                    .build()
-//                    .parseSignedClaims(token);
-//            return jwt.getPayload();
-//        } catch (RuntimeException e) {
-//            throw new RuntimeException("Invalid JWT signature", e);
-//        }
-//    }
-
-
+    private Claims extractAllClaims(String token) {
+        try {
+            Jwt<?, Claims> jwt = Jwts
+                    .parser()
+                    .verifyWith(getSignKey())
+                    .build()
+                    .parseSignedClaims(token);
+            return jwt.getPayload();
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Invalid JWT signature", e);
+        }
+    }
 
 }

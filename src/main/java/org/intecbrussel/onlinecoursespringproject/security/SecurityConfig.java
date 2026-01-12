@@ -21,7 +21,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for testing
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll() // Allow public access to auth endpoints
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         //.requestMatchers("/api/admin/**").permitAll() // TEMPORARY - for testing only
+                        .requestMatchers("/api/courses/**").permitAll() // Public course viewing
                         .anyRequest().authenticated() // Require authentication for other endpoints
                 );
 
