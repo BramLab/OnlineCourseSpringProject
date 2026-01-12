@@ -5,6 +5,8 @@ import org.intecbrussel.onlinecoursespringproject.dto.UserChangeRoleRequest;
 import org.intecbrussel.onlinecoursespringproject.dto.UserResponse;
 import org.intecbrussel.onlinecoursespringproject.service.AuthService;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 import java.util.Objects;
 
 @RestController
@@ -22,6 +24,16 @@ public class AdminController {
         // no right role?
         // no right access security?
         return authService.updateUserChangeRole(id, userChangeRoleRequest);
+    }
+
+    @GetMapping("/users")
+    public List<UserResponse> getAllUsers(){
+        return authService.getAllUsers();
+    }
+
+    @DeleteMapping("/users/{id}")
+    public void deleteUser(@PathVariable Long id){
+        authService.deleteUser(id);
     }
 
 }
