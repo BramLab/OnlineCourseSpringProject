@@ -71,6 +71,11 @@ public class AuthServiceImpl implements AuthService {
             throw new ResourceNotFoundException("Username not found. Are you registered?");
         }
         User user = optionalUser.get();
+
+        if (!passwordEncoder.matches(loginAuthRequest.password(), user.getPasswordHashed())) {
+            throw new ResourceNotFoundException("Invalid password");
+        }
+
         String jwtToken = jwtUtil.generateToken(user.getUsername(), user.getRole().name());
         return new LoginAuthResponse(user.getId(), user.getUsername(), user.getEmail(),
                 user.getRole(), jwtToken);
