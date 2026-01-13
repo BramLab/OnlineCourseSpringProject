@@ -81,27 +81,6 @@ public class AuthServiceImpl implements AuthService {
                 user.getRole(), jwtToken);
     }
 
-    @Override
-    public List<UserResponse> getAllUsers() {
-        return userRepository.findAll()
-                .stream()
-                .map(u -> UserMapper.mapToUserResponse(u))
-                //.map(UserMapper::mapToUserResponse) //method reference not intuitive yet
-                .toList();
-    }
 
-    @Override
-    public UserResponse updateUserChangeRole(Long id, UserChangeRoleRequest userChangeRoleRequest) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
-        user.setRole(userChangeRoleRequest.role());
-        User updatedUser = userRepository.save(user);
-        return UserMapper.mapToUserResponse(updatedUser);
-    }
-
-    @Override
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id);
-    }
 
 }

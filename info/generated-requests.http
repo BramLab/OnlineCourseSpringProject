@@ -1,0 +1,41 @@
+###
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "id": 0,
+  "userName": "b",
+  "email": "b@c",
+  "role": "ADMIN",
+  "password": "12345678"
+}
+
+###
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "b",
+  "password": "12345678"
+}
+
+###
+GET http://localhost:8080/api/admin/users
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJiIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzY4MzEzNjgzLCJleHAiOjE3NjgzMTQ4ODN9.fQ7meOiWHqy-kf8-C0evkht3DsStiYCkVFfOfUFVnuBQWbDg6CvRLoBe3GZYZfVD
+
+###
+DELETE http://localhost:8080/api/admin/users/6
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJiIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzY4MzEzNjgzLCJleHAiOjE3NjgzMTQ4ODN9.fQ7meOiWHqy-kf8-C0evkht3DsStiYCkVFfOfUFVnuBQWbDg6CvRLoBe3GZYZfVD
+
+###
+PUT http://localhost:8080/api/admin/users/5/role
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJiIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzY4MzEzNjgzLCJleHAiOjE3NjgzMTQ4ODN9.fQ7meOiWHqy-kf8-C0evkht3DsStiYCkVFfOfUFVnuBQWbDg6CvRLoBe3GZYZfVD
+
+{
+  "id": 5,
+  "role": "STUDENT"
+}
+
+###

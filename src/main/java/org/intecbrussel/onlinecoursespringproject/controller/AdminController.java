@@ -3,7 +3,7 @@ package org.intecbrussel.onlinecoursespringproject.controller;
 import lombok.RequiredArgsConstructor;
 import org.intecbrussel.onlinecoursespringproject.dto.UserChangeRoleRequest;
 import org.intecbrussel.onlinecoursespringproject.dto.UserResponse;
-import org.intecbrussel.onlinecoursespringproject.service.AuthService;
+import org.intecbrussel.onlinecoursespringproject.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class AdminController {
 
-    private final AuthService authService;
+    private final UserService userService;
 
     @PutMapping("/users/{id}/role")
     public UserResponse updateUserChangeRole(@PathVariable Long id, @RequestBody UserChangeRoleRequest userChangeRoleRequest) {
@@ -23,17 +23,17 @@ public class AdminController {
         }
         // no right role?
         // no right access security?
-        return authService.updateUserChangeRole(id, userChangeRoleRequest);
+        return userService.updateUserChangeRole(id, userChangeRoleRequest);
     }
 
     @GetMapping("/users")
     public List<UserResponse> getAllUsers(){
-        return authService.getAllUsers();
+        return userService.getAllUsers();
     }
 
     @DeleteMapping("/users/{id}")
     public void deleteUser(@PathVariable Long id){
-        authService.deleteUser(id);
+        userService.deleteUser(id);
     }
 
 }
