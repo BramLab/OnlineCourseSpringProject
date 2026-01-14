@@ -61,7 +61,8 @@ import org.springframework.http.HttpMethod;
 
 3. CourseServiceImpl.deleteCourse() - Wrong Authorization Check
 
-In deleteCourse(), you're checking if the user is the instructor, but according to requirements, only ADMIN can delete courses:
+In deleteCourse(), you're checking if the user is the instructor,
+but according to requirements, only ADMIN can delete courses:
 java
 
 @Override
@@ -130,7 +131,9 @@ private Course getCourseIfLoggedInUserIsAllowed(long courseId) {
 
 5. CourseServiceImpl.updateCourse() - Instructor Assignment Issue
 
-When updating a course, you're not preserving the instructor. The CourseRequest includes instructorId, but you should not allow changing the instructor:
+When updating a course, you're not preserving the instructor.
+The CourseRequest includes instructorId, but you should not allow
+changing the instructor:
 java
 
 @Override
@@ -144,7 +147,10 @@ public CourseResponse updateCourse(long id, CourseRequest courseRequest) {
     // ❌ Not setting instructor - but that's actually correct!
     // You should NOT allow changing the instructor
 
-This is actually correct as-is, but you should add a comment or remove instructorId from updates.
+This is actually correct as-is, but you should add a comment or remove
+ instructorId from updates.
+
+
 Minor Issues
 6. UserConfig.java - Duplicate Student Password
 java
@@ -162,7 +168,9 @@ import org.apache.coyote.BadRequestException;  // ❌ Not used
 
 8. CourseRequest - instructorId shouldn't be in updates
 
-The CourseRequest DTO includes instructorId, but you don't use it in updates (which is correct). Consider creating separate DTOs:
+The CourseRequest DTO includes instructorId,
+but you don't use it in updates (which is correct).
+Consider creating separate DTOs:
 
     CourseCreateRequest (with instructorId)
     CourseUpdateRequest (without instructorId)

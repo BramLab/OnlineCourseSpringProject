@@ -6,11 +6,15 @@ import org.intecbrussel.onlinecoursespringproject.dto.UserChangeRoleRequest;
 import org.intecbrussel.onlinecoursespringproject.dto.UserMapper;
 import org.intecbrussel.onlinecoursespringproject.dto.UserResponse;
 import org.intecbrussel.onlinecoursespringproject.exception.ResourceNotFoundException;
+import org.intecbrussel.onlinecoursespringproject.exception.UnauthorizedActionException;
 import org.intecbrussel.onlinecoursespringproject.model.User;
 import org.intecbrussel.onlinecoursespringproject.repository.UserRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional

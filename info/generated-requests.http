@@ -21,6 +21,11 @@ Content-Type: application/json
 }
 
 ###
+
+# CAPTURE webtoken?
+# https://www.jetbrains.com/help/idea/http-client-variables.html#random-variables
+
+###
 GET http://localhost:8080/api/admin/users
 Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJiIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzY4Mzg3MzYzLCJleHAiOjE3NjgzODg1NjN9.g-3tv94-LBM7aYErOnNMUrvegLRfi-9my6abOVA-8bf2hBM5kVQchsl6w2uyQlLk
 

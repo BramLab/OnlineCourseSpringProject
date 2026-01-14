@@ -44,7 +44,7 @@ public class UserConfig {
             userRepository.save(user_student1);
 
             User user_student2 = new User(0, "user_student2", "user_student2@c.com", Role.STUDENT
-                    , passwordEncoder.encode("s1"));
+                    , passwordEncoder.encode("s2"));
             userRepository.save(user_student2);
 
             User user_admin1 = new User(0, "user_admin1", "user_admin1@c.com", Role.ADMIN

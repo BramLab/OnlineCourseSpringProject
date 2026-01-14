@@ -21,11 +21,12 @@ import java.util.Optional;
 
 @Service
 @Transactional
-@RequiredArgsConstructor
+@RequiredArgsConstructor //only works when CourseRepository & UserRepository are final!
 public class CourseServiceImpl implements CourseService{
 
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
 
     @Override
     public CourseResponse createCourse(CourseRequest courseRequest){
@@ -46,12 +47,25 @@ public class CourseServiceImpl implements CourseService{
     }
 
     @Override
-    public CourseResponse updateCourse(long id, CourseRequest courseRequest) {
-        if (id != courseRequest.id()) {
+    public CourseResponse updateCourse(long courseId, CourseRequest courseRequest) {
+        if (courseId != courseRequest.id()) {
             throw new MissingDataException("The id of the requested course does not match.");
         }
 
-        Course course = getCourseIfLoggedInUserIsAllowed(courseRequest.id());
+        User user = getLoggedInUser();
+
+        Optional<Course> optionalCourse = courseRepository.findById(courseId);
+        if(optionalCourse.isEmpty()){
+            throw new ResourceNotFoundException("Course not found.");
+        }
+        Course course = optionalCourse.get();
+
+        if(!(   (user.getRole() == Role.ADMIN) ||
+                ( user.getRole() == Role.INSTRUCTOR && user.equals(course.getInstructor()) )
+        )){
+            throw new UnauthorizedActionException("You must either have role ADMIN, " +
+                    "or have role INSTRUCTOR and be author of this course.");
+        }
 
         // Validations of new request
         if(courseRequest.startDate()==null || courseRequest.endDate()==null ||
@@ -68,32 +82,37 @@ public class CourseServiceImpl implements CourseService{
         return CourseMapper.mapToCourseResponse(updatedCourse);
     }
 
-    private Course getCourseIfLoggedInUserIsAllowed(long courseId) {
-        // Find currently logged-in user.
-        String currentUsernameFromSecurityContext;
-        try{
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            currentUsernameFromSecurityContext = authentication.getName();
-        }catch(Exception e){
-            throw new UnauthorizedActionException("You are not authenticated. Login (again).");
-        }
-        Optional<User> optionalUser = userRepository.findByUsername(currentUsernameFromSecurityContext);
-        if(optionalUser.isEmpty() || optionalUser.get().getRole() != Role.INSTRUCTOR ){
-            throw new UnauthorizedActionException("User not found, or you do not have the role instructor.");
-        }
-
-        // Find course to be updated & check if current user is author of it.
-        Optional<Course> optionalCourse = courseRepository.findById(courseId);
-        if(optionalCourse.isEmpty() || !Objects.equals(optionalCourse.get().getInstructor(), optionalUser.get())){
-            throw new ResourceNotFoundException("Course not found, or you are not the instructor of this course.");
-        }
-        Course course = optionalCourse.get();
-        return course;
-    }
+//    private Course getCourseIfLoggedInUserIsAllowed(long courseId) {
+//        User user = getLoggedInUser();
+//
+//        Optional<Course> optionalCourse = courseRepository.findById(courseId);
+//        if(optionalCourse.isEmpty()){
+//            throw new ResourceNotFoundException("Course not found.");
+//        }
+//        Course course = optionalCourse.get();
+//
+//        if(     (user.getRole() == Role.ADMIN) ||
+//                ( user.getRole() == Role.INSTRUCTOR && user.equals(course.getInstructor()) )
+//        ){
+//            return course;
+//        } else {
+//            throw new UnauthorizedActionException("You must either have role ADMIN, or have role INSTRUCTOR and be author of this course.");
+//        }
+//    }
 
     @Override
     public void deleteCourse(long courseId) {
-        Course course = getCourseIfLoggedInUserIsAllowed(courseId);
+
+        User user = getLoggedInUser();
+        if(user.getRole() != Role.ADMIN){
+            throw new UnauthorizedActionException("You must have role ADMIN.");
+        }
+
+        Optional<Course> optionalCourse = courseRepository.findById(courseId);
+        if(optionalCourse.isEmpty()){
+            throw new ResourceNotFoundException("Course not found.");
+        }
+        Course course = optionalCourse.get();
         courseRepository.delete(course);
     }
 
@@ -111,4 +130,23 @@ public class CourseServiceImpl implements CourseService{
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found with id: " + id));
         return CourseMapper.mapToCourseResponse(course);
     }
+
+    protected User getLoggedInUser() {
+        // Find currently logged-in user:
+        String currentUsernameFromSecurityContext;
+        try{
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            currentUsernameFromSecurityContext = authentication.getName();
+        }catch(Exception e){
+            throw new UnauthorizedActionException("You are not authenticated. Please login (again).");
+        }
+
+        Optional<User> optionalUser = userRepository.findByUsername(currentUsernameFromSecurityContext);
+        if(optionalUser.isEmpty()){
+            throw new UnauthorizedActionException("User not found.");
+        }
+        User user = optionalUser.get();
+        return user;
+    }
+
 }
