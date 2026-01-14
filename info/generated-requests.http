@@ -1,3 +1,4 @@
+# Registration, Authentication, Users
 ###
 POST http://localhost:8080/api/auth/register
 Content-Type: application/json
@@ -21,7 +22,7 @@ Content-Type: application/json
 
 ###
 GET http://localhost:8080/api/admin/users
-Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJiIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzY4MzEzNjgzLCJleHAiOjE3NjgzMTQ4ODN9.fQ7meOiWHqy-kf8-C0evkht3DsStiYCkVFfOfUFVnuBQWbDg6CvRLoBe3GZYZfVD
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJiIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzY4Mzg3MzYzLCJleHAiOjE3NjgzODg1NjN9.g-3tv94-LBM7aYErOnNMUrvegLRfi-9my6abOVA-8bf2hBM5kVQchsl6w2uyQlLk
 
 ###
 DELETE http://localhost:8080/api/admin/users/6
@@ -37,5 +38,49 @@ Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJiIiwicm9sZSI6IkFETUlOIiwia
   "id": 5,
   "role": "STUDENT"
 }
+
+###
+
+# Courses
+###
+GET http://localhost:8080/api/courses
+
+###
+POST http://localhost:8080/api/courses
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJiIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzY4MzEzNjgzLCJleHAiOjE3NjgzMTQ4ODN9.fQ7meOiWHqy-kf8-C0evkht3DsStiYCkVFfOfUFVnuBQWbDg6CvRLoBe3GZYZfVD
+
+{
+  "id": 0,
+  "title": "",
+  "description": "",
+  "instructorId": 0,
+  "startDate": "",
+  "endDate": ""
+}
+
+###
+GET http://localhost:8080/api/courses/{{id}}
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJiIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzY4MzEzNjgzLCJleHAiOjE3NjgzMTQ4ODN9.fQ7meOiWHqy-kf8-C0evkht3DsStiYCkVFfOfUFVnuBQWbDg6CvRLoBe3GZYZfVD
+
+###
+PUT http://localhost:8080/api/courses/{{id}}
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJiIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzY4MzEzNjgzLCJleHAiOjE3NjgzMTQ4ODN9.fQ7meOiWHqy-kf8-C0evkht3DsStiYCkVFfOfUFVnuBQWbDg6CvRLoBe3GZYZfVD
+
+{
+  "id": 0,
+  "title": "",
+  "description": "",
+  "instructorId": 0,
+  "startDate": "",
+  "endDate": ""
+}
+
+###
+DELETE http://localhost:8080/api/courses/{{id}}
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJiIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzY4MzEzNjgzLCJleHAiOjE3NjgzMTQ4ODN9.fQ7meOiWHqy-kf8-C0evkht3DsStiYCkVFfOfUFVnuBQWbDg6CvRLoBe3GZYZfVD
 
 ###

@@ -1,7 +1,6 @@
 package org.intecbrussel.onlinecoursespringproject.repository;
 
 import org.intecbrussel.onlinecoursespringproject.model.Course;
-import org.intecbrussel.onlinecoursespringproject.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

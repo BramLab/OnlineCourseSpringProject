@@ -1,5 +1,12 @@
 package org.intecbrussel.onlinecoursespringproject.dto;
 
-public record CourseRequest(
+import java.util.Date;
 
+public record CourseRequest(
+        long id,
+        String title,
+        String description,
+        long instructorId,
+        Date startDate,
+        Date endDate
 ) {}
