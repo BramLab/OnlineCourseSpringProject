@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -26,20 +27,27 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public CourseResponse createCourse(String title, String description, long instructorId, Date startDate, Date endDate) throws BadRequestException {
-        User user = userRepository.getReferenceById(instructorId);
-        if(user==null || user.getRole() != Role.INSTRUCTOR ){
+        Optional<User> optionalUser = userRepository.findById(instructorId);
+        if(optionalUser.isEmpty() || optionalUser.get().getRole() != Role.INSTRUCTOR ){
             throw new ResourceNotFoundException("User not found, or this user is not an instructor.");
         }
         if(startDate==null || endDate==null || endDate.before(startDate)){
             throw new BadRequestException("End date cannot be before start date.");
         }
-        Course course = new Course(0, title, description, user, startDate, endDate);
+        Course course = new Course(0, title, description, optionalUser.get(), startDate, endDate);
         Course createdCourse = courseRepository.save(course);
         return CourseMapper.mapToCourseResponse(createdCourse);
     }
 
     @Override
     public Course updateCourse(long id, String title, String description, Date startDate, Date endDate) {
+        Optional<User> optionalUser = userRepository.findById(id);
+
+        Optional<Course> optionalCourse = courseRepository.findById(id);
+
+//        if(optionalCourse.isEmpty() || optionalCourse.get().getInstructor() != *** ){
+//            throw new ResourceNotFoundException("User not found, or this user is not an instructor.");
+//        }
         return null;
     }
 
