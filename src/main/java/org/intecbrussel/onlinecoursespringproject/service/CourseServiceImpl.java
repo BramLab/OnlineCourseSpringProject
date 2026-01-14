@@ -2,7 +2,6 @@ package org.intecbrussel.onlinecoursespringproject.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
 import org.intecbrussel.onlinecoursespringproject.dto.*;
 import org.intecbrussel.onlinecoursespringproject.exception.MissingDataException;
 import org.intecbrussel.onlinecoursespringproject.exception.ResourceNotFoundException;
@@ -16,7 +15,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -26,8 +24,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CourseServiceImpl implements CourseService{
 
-    CourseRepository courseRepository;
-    UserRepository userRepository;
+    private final CourseRepository courseRepository;
+    private final UserRepository userRepository;
 
     @Override
     public CourseResponse createCourse(CourseRequest courseRequest){
@@ -71,7 +69,7 @@ public class CourseServiceImpl implements CourseService{
     }
 
     private Course getCourseIfLoggedInUserIsAllowed(long courseId) {
-        // Find currently logged in user.
+        // Find currently logged-in user.
         String currentUsernameFromSecurityContext;
         try{
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

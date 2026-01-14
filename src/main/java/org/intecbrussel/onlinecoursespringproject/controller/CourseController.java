@@ -5,6 +5,7 @@ import org.intecbrussel.onlinecoursespringproject.dto.CourseRequest;
 import org.intecbrussel.onlinecoursespringproject.dto.CourseResponse;
 import org.intecbrussel.onlinecoursespringproject.repository.CourseRepository;
 import org.intecbrussel.onlinecoursespringproject.service.CourseService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
