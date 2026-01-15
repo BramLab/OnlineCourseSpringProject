@@ -1,0 +1,173 @@
+# ==================== AUTHENTICATION ====================
+
+### Register a new user
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "id": 0,
+  "userName": "test_user",
+  "email": "test@example.com",
+  "role": "ADMIN",
+  "password": "password123"
+}
+
+### Login and capture token
+# @name login
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "test_user",
+  "password": "password123"
+}
+
+> {%
+    client.global.set("auth_token", response.body.token);
+    client.log("Token saved: " + response.body.token);
+%}
+
+### Alternative: Login as existing user
+# @name loginExisting
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "user_admin1",
+  "password": "a1"
+}
+
+> {%
+    client.global.set("auth_token", response.body.token);
+    client.log("Token saved: " + response.body.token);
+%}
+
+# ==================== ADMIN ENDPOINTS ====================
+
+### Get all users (uses captured token)
+GET http://localhost:8080/api/admin/users
+Authorization: Bearer {{auth_token}}
+
+### Update user role (uses captured token)
+PUT http://localhost:8080/api/admin/users/5/role
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "id": 5,
+  "role": "INSTRUCTOR"
+}
+
+### Delete user (uses captured token)
+DELETE http://localhost:8080/api/admin/users/6
+Authorization: Bearer {{auth_token}}
+
+# ==================== COURSE ENDPOINTS ====================
+
+### Get all courses (public - no auth needed)
+GET http://localhost:8080/api/courses
+
+### Get course by ID (public - no auth needed)
+GET http://localhost:8080/api/courses/1
+
+### Create a new course (uses captured token)
+POST http://localhost:8080/api/courses
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "id": 0,
+  "title": "Test Course",
+  "description": "A test course description",
+  "instructorId": 2,
+  "startDate": "2026-06-01T00:00:00.000+00:00",
+  "endDate": "2026-09-01T00:00:00.000+00:00"
+}
+
+### Update a course (uses captured token)
+PUT http://localhost:8080/api/courses/1
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "id": 1,
+  "title": "Updated Course Title",
+  "description": "Updated description",
+  "instructorId": 2,
+  "startDate": "2026-04-01T00:00:00.000+00:00",
+  "endDate": "2026-09-01T00:00:00.000+00:00"
+}
+
+### Delete a course (uses captured token)
+DELETE http://localhost:8080/api/courses/3
+Authorization: Bearer {{auth_token}}
+
+# ==================== QUICK TEST SEQUENCE ====================
+
+### 1. First run this to login and capture token
+# @name quickLogin
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "user_admin1",
+  "password": "a1"
+}
+
+> {%
+    client.global.set("auth_token", response.body.token);
+    client.log("✓ Token captured!");
+%}
+
+### 2. Then run this to test the token works
+GET http://localhost:8080/api/admin/users
+Authorization: Bearer {{auth_token}}
+
+# ==================== DIFFERENT USER LOGINS ====================
+
+### Login as Student
+# @name loginStudent
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "user_student1",
+  "password": "s1"
+}
+
+> {%
+    client.global.set("auth_token", response.body.token);
+    client.log("Student token saved");
+%}
+
+### Login as Instructor
+# @name loginInstructor
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "user_instructor1",
+  "password": "i1"
+}
+
+> {%
+    client.global.set("auth_token", response.body.token);
+    client.log("Instructor token saved");
+%}
+
+### Login as Admin
+# @name loginAdmin
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "user_admin1",
+  "password": "a1"
+}
+
+> {%
+    client.global.set("auth_token", response.body.token);
+    client.log("Admin token saved");
+%}
+
+###

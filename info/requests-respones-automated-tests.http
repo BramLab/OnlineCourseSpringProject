@@ -1,0 +1,513 @@
+# ==================== AUTOMATED TEST SUITE ====================
+# Run all tests sequentially or individually
+# Results will show in the "Run" tool window
+
+# ==================== SETUP ====================
+
+### SETUP: Clear any existing tokens
+
+###
+
+{%
+    client.global.clear("auth_token");
+    client.global.clear("test_user_id");
+    client.global.clear("test_course_id");
+    client.log("=== Test Suite Started ===");
+%}
+
+# ==================== AUTHENTICATION TESTS ====================
+
+### TEST 1: Register new user - Should succeed
+# @name test_register
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "id": 0,
+  "userName": "automated_test_user_{{$random.integer(1000, 9999)}}",
+  "email": "test_{{$random.integer(1000, 9999)}}@example.com",
+  "role": "STUDENT",
+  "password": "testpass123"
+}
+
+> {%
+    client.test("Register: Status is 200", function() {
+        client.assert(response.status === 200, "Expected status 200");
+    });
+
+    client.test("Register: Response has user data", function() {
+        client.assert(response.body.id !== undefined, "User ID should be present");
+        client.assert(response.body.userName !== undefined, "Username should be present");
+        client.assert(response.body.email !== undefined, "Email should be present");
+        client.assert(response.body.role === "STUDENT", "Role should be STUDENT");
+    });
+
+    client.test("Register: Password not returned", function() {
+        client.assert(response.body.password === undefined, "Password should not be in response");
+        client.assert(response.body.passwordHashed === undefined, "Password hash should not be in response");
+    });
+
+    // Save for later tests
+    client.global.set("test_user_name", response.body.userName);
+    client.global.set("test_user_id", response.body.id);
+    client.log("✓ Test user created: " + response.body.userName);
+%}
+
+### TEST 2: Register duplicate user - Should fail
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "id": 0,
+  "userName": "user_admin1",
+  "email": "duplicate@example.com",
+  "role": "STUDENT",
+  "password": "testpass123"
+}
+
+> {%
+    client.test("Duplicate register: Should return 400", function() {
+        client.assert(response.status === 400, "Expected status 400 for duplicate username");
+    });
+
+    client.test("Duplicate register: Has error message", function() {
+        client.assert(response.body.message !== undefined, "Should have error message");
+    });
+
+    client.log("✓ Duplicate registration correctly rejected");
+%}
+
+### TEST 3: Login with valid credentials - Should succeed
+# @name test_login
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "user_admin1",
+  "password": "a1"
+}
+
+> {%
+    client.test("Login: Status is 200", function() {
+        client.assert(response.status === 200, "Expected status 200");
+    });
+
+    client.test("Login: Response has token", function() {
+        client.assert(response.body.token !== undefined, "Token should be present");
+        client.assert(response.body.token.length > 50, "Token should be a JWT string");
+    });
+
+    client.test("Login: Response has user data", function() {
+        client.assert(response.body.id !== undefined, "User ID should be present");
+        client.assert(response.body.userName === "user_admin1", "Username should match");
+        client.assert(response.body.role === "ADMIN", "Role should be ADMIN");
+    });
+
+    client.global.set("auth_token", response.body.token);
+    client.global.set("admin_id", response.body.id);
+    client.log("✓ Admin login successful, token captured");
+%}
+
+### TEST 4: Login with invalid credentials - Should fail
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "user_admin1",
+  "password": "wrong_password"
+}
+
+> {%
+    client.test("Invalid login: Should return 404", function() {
+        client.assert(response.status === 404, "Expected status 404");
+    });
+
+    client.test("Invalid login: Has error message", function() {
+        client.assert(response.body.message !== undefined, "Should have error message");
+        client.assert(response.body.message.includes("password"), "Error should mention password");
+    });
+
+    client.log("✓ Invalid login correctly rejected");
+%}
+
+### TEST 5: Login with non-existent user - Should fail
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "non_existent_user",
+  "password": "somepassword"
+}
+
+> {%
+    client.test("Non-existent user login: Should return 404", function() {
+        client.assert(response.status === 404, "Expected status 404");
+    });
+
+    client.test("Non-existent user login: Has error message", function() {
+        client.assert(response.body.message !== undefined, "Should have error message");
+    });
+
+    client.log("✓ Non-existent user login correctly rejected");
+%}
+
+# ==================== COURSE TESTS (PUBLIC) ====================
+
+### TEST 6: Get all courses (public) - Should succeed
+GET http://localhost:8080/api/courses
+
+> {%
+    client.test("Get all courses: Status is 200", function() {
+        client.assert(response.status === 200, "Expected status 200");
+    });
+
+    client.test("Get all courses: Returns array", function() {
+        client.assert(Array.isArray(response.body), "Response should be an array");
+        client.assert(response.body.length > 0, "Should have at least one course");
+    });
+
+    client.test("Get all courses: Course has correct structure", function() {
+        const course = response.body[0];
+        client.assert(course.id !== undefined, "Course should have id");
+        client.assert(course.title !== undefined, "Course should have title");
+        client.assert(course.description !== undefined, "Course should have description");
+        client.assert(course.instructor !== undefined, "Course should have instructor");
+        client.assert(course.startDate !== undefined, "Course should have startDate");
+        client.assert(course.endDate !== undefined, "Course should have endDate");
+    });
+
+    // Save first course ID for later tests
+    if (response.body.length > 0) {
+        client.global.set("existing_course_id", response.body[0].id);
+        client.global.set("existing_course_instructor_id", response.body[0].instructor.id);
+    }
+
+    client.log("✓ Retrieved " + response.body.length + " courses");
+%}
+
+### TEST 7: Get course by ID (public) - Should succeed
+GET http://localhost:8080/api/courses/{{existing_course_id}}
+
+> {%
+    client.test("Get course by ID: Status is 200", function() {
+        client.assert(response.status === 200, "Expected status 200");
+    });
+
+    client.test("Get course by ID: Returns course object", function() {
+        client.assert(response.body.id === parseInt(client.global.get("existing_course_id")), "Course ID should match");
+        client.assert(response.body.title !== undefined, "Should have title");
+        client.assert(response.body.instructor.userName !== undefined, "Should have instructor name");
+    });
+
+    client.log("✓ Retrieved course: " + response.body.title);
+%}
+
+### TEST 8: Get non-existent course - Should fail
+GET http://localhost:8080/api/courses/99999
+
+> {%
+    client.test("Non-existent course: Status is 404", function() {
+        client.assert(response.status === 404, "Expected status 404");
+    });
+
+    client.test("Non-existent course: Has error message", function() {
+        client.assert(response.body.message !== undefined, "Should have error message");
+    });
+
+    client.log("✓ Non-existent course correctly returns 404");
+%}
+
+# ==================== COURSE TESTS (AUTHENTICATED) ====================
+
+### TEST 9: Create course without auth - Should fail
+POST http://localhost:8080/api/courses
+Content-Type: application/json
+
+{
+  "id": 0,
+  "title": "Unauthorized Course",
+  "description": "This should fail",
+  "instructorId": 2,
+  "startDate": "2026-06-01T00:00:00.000+00:00",
+  "endDate": "2026-09-01T00:00:00.000+00:00"
+}
+
+> {%
+    client.test("Create without auth: Should return 401 or 403", function() {
+        client.assert(response.status === 401 || response.status === 403, "Expected 401 or 403");
+    });
+
+    client.log("✓ Unauthorized course creation correctly rejected");
+%}
+
+### TEST 10: Login as Instructor for course tests
+# @name login_instructor
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "user_instructor1",
+  "password": "i1"
+}
+
+> {%
+    client.global.set("instructor_token", response.body.token);
+    client.global.set("instructor_id", response.body.id);
+    client.log("✓ Instructor logged in");
+%}
+
+### TEST 11: Create course as Instructor - Should succeed
+POST http://localhost:8080/api/courses
+Content-Type: application/json
+Authorization: Bearer {{instructor_token}}
+
+{
+  "id": 0,
+  "title": "Test Course {{$random.integer(100, 999)}}",
+  "description": "Automated test course",
+  "instructorId": {{instructor_id}},
+  "startDate": "2026-06-01T00:00:00.000+00:00",
+  "endDate": "2026-09-01T00:00:00.000+00:00"
+}
+
+> {%
+    client.test("Create course: Status is 200", function() {
+        client.assert(response.status === 200, "Expected status 200");
+    });
+
+    client.test("Create course: Returns created course", function() {
+        client.assert(response.body.id !== undefined, "Should have course ID");
+        client.assert(response.body.title !== undefined, "Should have title");
+        client.assert(response.body.instructor.id === parseInt(client.global.get("instructor_id")), "Instructor ID should match");
+    });
+
+    client.global.set("test_course_id", response.body.id);
+    client.log("✓ Course created with ID: " + response.body.id);
+%}
+
+### TEST 12: Create course with invalid dates - Should fail
+POST http://localhost:8080/api/courses
+Content-Type: application/json
+Authorization: Bearer {{instructor_token}}
+
+{
+  "id": 0,
+  "title": "Invalid Date Course",
+  "description": "End date before start date",
+  "instructorId": {{instructor_id}},
+  "startDate": "2026-09-01T00:00:00.000+00:00",
+  "endDate": "2026-06-01T00:00:00.000+00:00"
+}
+
+> {%
+    client.test("Invalid dates: Should return 400", function() {
+        client.assert(response.status === 400, "Expected status 400");
+    });
+
+    client.test("Invalid dates: Has error message", function() {
+        client.assert(response.body.message !== undefined, "Should have error message");
+    });
+
+    client.log("✓ Invalid date course correctly rejected");
+%}
+
+### TEST 13: Update own course as Instructor - Should succeed
+PUT http://localhost:8080/api/courses/{{test_course_id}}
+Content-Type: application/json
+Authorization: Bearer {{instructor_token}}
+
+{
+  "id": {{test_course_id}},
+  "title": "Updated Test Course",
+  "description": "Updated by instructor",
+  "instructorId": {{instructor_id}},
+  "startDate": "2026-06-01T00:00:00.000+00:00",
+  "endDate": "2026-09-01T00:00:00.000+00:00"
+}
+
+> {%
+    client.test("Update own course: Status is 200", function() {
+        client.assert(response.status === 200, "Expected status 200");
+    });
+
+    client.test("Update own course: Title updated", function() {
+        client.assert(response.body.title === "Updated Test Course", "Title should be updated");
+    });
+
+    client.log("✓ Course updated successfully");
+%}
+
+### TEST 14: Login as Student
+# @name login_student
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "user_student1",
+  "password": "s1"
+}
+
+> {%
+    client.global.set("student_token", response.body.token);
+    client.log("✓ Student logged in");
+%}
+
+### TEST 15: Update course as Student - Should fail
+PUT http://localhost:8080/api/courses/{{test_course_id}}
+Content-Type: application/json
+Authorization: Bearer {{student_token}}
+
+{
+  "id": {{test_course_id}},
+  "title": "Unauthorized Update",
+  "description": "Student trying to update",
+  "instructorId": {{instructor_id}},
+  "startDate": "2026-06-01T00:00:00.000+00:00",
+  "endDate": "2026-09-01T00:00:00.000+00:00"
+}
+
+> {%
+    client.test("Student update: Should return 403", function() {
+        client.assert(response.status === 403, "Expected status 403");
+    });
+
+    client.log("✓ Student course update correctly rejected");
+%}
+
+### TEST 16: Delete course as Student - Should fail
+DELETE http://localhost:8080/api/courses/{{test_course_id}}
+Authorization: Bearer {{student_token}}
+
+> {%
+    client.test("Student delete: Should return 403", function() {
+        client.assert(response.status === 403, "Expected status 403");
+    });
+
+    client.log("✓ Student course delete correctly rejected");
+%}
+
+# ==================== ADMIN TESTS ====================
+
+### TEST 17: Get all users as Admin - Should succeed
+GET http://localhost:8080/api/admin/users
+Authorization: Bearer {{auth_token}}
+
+> {%
+    client.test("Get all users: Status is 200", function() {
+        client.assert(response.status === 200, "Expected status 200");
+    });
+
+    client.test("Get all users: Returns array", function() {
+        client.assert(Array.isArray(response.body), "Response should be an array");
+        client.assert(response.body.length > 0, "Should have at least one user");
+    });
+
+    client.test("Get all users: User has correct structure", function() {
+        const user = response.body[0];
+        client.assert(user.id !== undefined, "User should have id");
+        client.assert(user.userName !== undefined, "User should have userName");
+        client.assert(user.email !== undefined, "User should have email");
+        client.assert(user.role !== undefined, "User should have role");
+        client.assert(user.password === undefined, "User should not have password");
+    });
+
+    client.log("✓ Retrieved " + response.body.length + " users");
+%}
+
+### TEST 18: Get all users as Student - Should fail
+GET http://localhost:8080/api/admin/users
+Authorization: Bearer {{student_token}}
+
+> {%
+    client.test("Student get users: Should return 403", function() {
+        client.assert(response.status === 403, "Expected status 403");
+    });
+
+    client.log("✓ Student admin access correctly rejected");
+%}
+
+### TEST 19: Update user role as Admin - Should succeed
+PUT http://localhost:8080/api/admin/users/{{test_user_id}}/role
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "id": {{test_user_id}},
+  "role": "INSTRUCTOR"
+}
+
+> {%
+    client.test("Update user role: Status is 200", function() {
+        client.assert(response.status === 200, "Expected status 200");
+    });
+
+    client.test("Update user role: Role changed", function() {
+        client.assert(response.body.role === "INSTRUCTOR", "Role should be INSTRUCTOR");
+    });
+
+    client.log("✓ User role updated to INSTRUCTOR");
+%}
+
+### TEST 20: Update course as Admin (any course) - Should succeed
+PUT http://localhost:8080/api/courses/{{test_course_id}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "id": {{test_course_id}},
+  "title": "Admin Updated Course",
+  "description": "Updated by admin",
+  "instructorId": {{instructor_id}},
+  "startDate": "2026-06-01T00:00:00.000+00:00",
+  "endDate": "2026-09-01T00:00:00.000+00:00"
+}
+
+> {%
+    client.test("Admin update any course: Status is 200", function() {
+        client.assert(response.status === 200, "Expected status 200");
+    });
+
+    client.test("Admin update: Title updated", function() {
+        client.assert(response.body.title === "Admin Updated Course", "Title should be updated");
+    });
+
+    client.log("✓ Admin successfully updated any course");
+%}
+
+### TEST 21: Delete course as Admin - Should succeed
+DELETE http://localhost:8080/api/courses/{{test_course_id}}
+Authorization: Bearer {{auth_token}}
+
+> {%
+    client.test("Admin delete course: Status is 200", function() {
+        client.assert(response.status === 200, "Expected status 200");
+    });
+
+    client.log("✓ Admin successfully deleted course");
+%}
+
+### TEST 22: Verify course deleted
+GET http://localhost:8080/api/courses/{{test_course_id}}
+
+> {%
+    client.test("Deleted course: Should return 404", function() {
+        client.assert(response.status === 404, "Expected status 404");
+    });
+
+    client.log("✓ Course deletion confirmed");
+%}
+
+### TEST 23: Delete test user as Admin - Cleanup
+DELETE http://localhost:8080/api/admin/users/{{test_user_id}}
+Authorization: Bearer {{auth_token}}
+
+> {%
+    client.test("Delete test user: Status is 200", function() {
+        client.assert(response.status === 200, "Expected status 200");
+    });
+
+    client.log("✓ Test user deleted (cleanup)");
+    client.log("=== Test Suite Completed ===");
+%}
+
+###

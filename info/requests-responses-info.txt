@@ -1,0 +1,22 @@
+How to Use the Updated .http File:
+First, run the login request (the one with # @name login)
+This will capture the token automatically using the response handler
+
+Then run any other request that uses {{auth_token}}
+The token will be automatically inserted
+
+The token is saved globally so it persists across all requests in the file
+
+
+Key Features:
+Response handlers (> {% ... %}) capture the token automatically
+Global variables (client.global.set()) make it available everywhere
+No manual copy-paste needed
+Logging shows when the token is captured
+
+
+Tips:
+Always run a login request first to capture the token
+If you get 401 errors, the token might have expired - run login again
+You can switch between different user roles by running their respective login requests
+The {{auth_token}} variable works in all requests after capture
