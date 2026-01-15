@@ -2,8 +2,6 @@ package org.intecbrussel.onlinecoursespringproject.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.intecbrussel.onlinecoursespringproject.dto.EnrollmentResponse;
-import org.intecbrussel.onlinecoursespringproject.model.Enrollment;
-import org.intecbrussel.onlinecoursespringproject.repository.CustomEnrollmentRepository;
 import org.intecbrussel.onlinecoursespringproject.repository.EnrollmentRepository;
 import org.intecbrussel.onlinecoursespringproject.service.EnrollmentService;
 import org.intecbrussel.onlinecoursespringproject.service.UserService;
@@ -20,7 +18,6 @@ import java.util.List;
 public class EnrollmentController {
 
     private final EnrollmentService enrollmentService;
-    //private final CustomEnrollmentRepository customEnrollmentRepository;
     private final UserService userService;
     private final EnrollmentRepository enrollmentRepository;
 
@@ -38,22 +35,7 @@ public class EnrollmentController {
         return enrollmentService.createEnrollment(id, userId);
     }
 
-    @GetMapping("/enrollments/me")
-    @PreAuthorize("hasRole('STUDENT')")
-    public List<Enrollment> getMyEnrollments() {
-        long studentId = userService.getLoggedInUser().getId();
-        return enrollmentRepository.findForStudent(studentId);
-    }
-
-    @GetMapping("/instructor/enrollments")
-    @PreAuthorize("hasRole('INSTRUCTOR')")
-    public List<Enrollment> getInstructorEnrollments() {
-        long instructorId = userService.getLoggedInUser().getId();
-        return enrollmentRepository.findForInstructor(instructorId);
-    }
-
-
-    // Mappings can probably be combined. No time to research. Later.
+    // These 3 mappings can probably be combined. No time to research. Later.
     //GET /api  /instructor/enrollments INSTRUCTOR
     @GetMapping("/instructor/enrollments")
     @PreAuthorize("hasRole('INSTRUCTOR')")
@@ -72,7 +54,6 @@ public class EnrollmentController {
     public List<EnrollmentResponse> getAllEnrollments() {
         return enrollmentService.listEnrollments();
     }
-
 
     @DeleteMapping("/enrollments/{enrollmentId}")
     @PreAuthorize("hasAnyRole('STUDENT', 'ADMIN')")
