@@ -29,7 +29,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
     private final UserService userService;
-    private final CustomEnrollmentRepository customEnrollmentRepository;
+    //private final CustomEnrollmentRepository customEnrollmentRepository;
 
     //Enroll student in course (student self of admin)
     //• List enrollments:
@@ -72,13 +72,13 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         List<EnrollmentResponse> enrollments = new ArrayList<>();
 
         if (loggedInUser.getRole() == Role.STUDENT) {
-            enrollments = customEnrollmentRepository.findForStudent(loggedInUser.getId())
+            enrollments = enrollmentRepository.findForStudent(loggedInUser.getId())
                     .stream()
                     .map(e -> EnrollmentMapper.mapToEnrollmentResponse(e))
                     .toList();
         }
         else if (loggedInUser.getRole() == Role.INSTRUCTOR) {
-            enrollments = customEnrollmentRepository.findForInstructor(loggedInUser.getId())
+            enrollments = enrollmentRepository.findForInstructor(loggedInUser.getId())
                     .stream()
                     .map(e -> EnrollmentMapper.mapToEnrollmentResponse(e))
                     .toList();

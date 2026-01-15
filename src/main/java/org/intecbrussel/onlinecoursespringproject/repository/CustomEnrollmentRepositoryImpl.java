@@ -3,10 +3,10 @@ package org.intecbrussel.onlinecoursespringproject.repository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.intecbrussel.onlinecoursespringproject.model.Enrollment;
-
+import org.springframework.stereotype.Repository;
 import java.util.List;
-import java.util.Optional;
 
+@Repository
 public class CustomEnrollmentRepositoryImpl implements CustomEnrollmentRepository {
 
     // https://kanakalakshmi.medium.com/understanding-custom-repository-creation-in-spring-boot-2c786d600a5b

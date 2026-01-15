@@ -20,7 +20,7 @@ import java.util.List;
 public class EnrollmentController {
 
     private final EnrollmentService enrollmentService;
-    private final CustomEnrollmentRepository customEnrollmentRepository;
+    //private final CustomEnrollmentRepository customEnrollmentRepository;
     private final UserService userService;
     private final EnrollmentRepository enrollmentRepository;
 
@@ -42,14 +42,14 @@ public class EnrollmentController {
     @PreAuthorize("hasRole('STUDENT')")
     public List<Enrollment> getMyEnrollments() {
         long studentId = userService.getLoggedInUser().getId();
-        return customEnrollmentRepository.findForStudent(studentId);
+        return enrollmentRepository.findForStudent(studentId);
     }
 
     @GetMapping("/instructor/enrollments")
     @PreAuthorize("hasRole('INSTRUCTOR')")
-    public List<Enrollment> getInstructorEnrollments(Authentication auth) {
+    public List<Enrollment> getInstructorEnrollments() {
         long instructorId = userService.getLoggedInUser().getId();
-        return customEnrollmentRepository.findForInstructor(instructorId);
+        return enrollmentRepository.findForInstructor(instructorId);
     }
 
 
