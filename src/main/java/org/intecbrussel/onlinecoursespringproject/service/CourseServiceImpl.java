@@ -52,7 +52,7 @@ public class CourseServiceImpl implements CourseService{
             throw new MissingDataException("The id of the requested course does not match.");
         }
 
-        User user = getLoggedInUser();
+        User user = userService.getLoggedInUser();
 
         Optional<Course> optionalCourse = courseRepository.findById(courseId);
         if(optionalCourse.isEmpty()){
@@ -82,28 +82,10 @@ public class CourseServiceImpl implements CourseService{
         return CourseMapper.mapToCourseResponse(updatedCourse);
     }
 
-//    private Course getCourseIfLoggedInUserIsAllowed(long courseId) {
-//        User user = getLoggedInUser();
-//
-//        Optional<Course> optionalCourse = courseRepository.findById(courseId);
-//        if(optionalCourse.isEmpty()){
-//            throw new ResourceNotFoundException("Course not found.");
-//        }
-//        Course course = optionalCourse.get();
-//
-//        if(     (user.getRole() == Role.ADMIN) ||
-//                ( user.getRole() == Role.INSTRUCTOR && user.equals(course.getInstructor()) )
-//        ){
-//            return course;
-//        } else {
-//            throw new UnauthorizedActionException("You must either have role ADMIN, or have role INSTRUCTOR and be author of this course.");
-//        }
-//    }
-
     @Override
     public void deleteCourse(long courseId) {
 
-        User user = getLoggedInUser();
+        User user = userService.getLoggedInUser();
         if(user.getRole() != Role.ADMIN){
             throw new UnauthorizedActionException("You must have role ADMIN.");
         }
@@ -129,24 +111,6 @@ public class CourseServiceImpl implements CourseService{
         Course course = courseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found with id: " + id));
         return CourseMapper.mapToCourseResponse(course);
-    }
-
-    protected User getLoggedInUser() {
-        // Find currently logged-in user:
-        String currentUsernameFromSecurityContext;
-        try{
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            currentUsernameFromSecurityContext = authentication.getName();
-        }catch(Exception e){
-            throw new UnauthorizedActionException("You are not authenticated. Please login (again).");
-        }
-
-        Optional<User> optionalUser = userRepository.findByUsername(currentUsernameFromSecurityContext);
-        if(optionalUser.isEmpty()){
-            throw new UnauthorizedActionException("User not found.");
-        }
-        User user = optionalUser.get();
-        return user;
     }
 
 }

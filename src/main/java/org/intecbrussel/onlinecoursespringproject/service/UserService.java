@@ -8,10 +8,7 @@ import java.util.List;
 
 public interface UserService {
     List<UserResponse> getAllUsers();
-    UserResponse updateUserChangeRole(Long id, UserChangeRoleRequest userChangeRoleRequest);
-    void deleteUser(Long id);
-    //User getLoggedInUser();
-
-    //    UserResponse getUserById(long id);
-    //    List<UserResponse> getUsersByRole(Role role);
+    UserResponse updateUserChangeRole(long id, UserChangeRoleRequest userChangeRoleRequest);
+    void deleteUser(long id);
+    User getLoggedInUser();
 }

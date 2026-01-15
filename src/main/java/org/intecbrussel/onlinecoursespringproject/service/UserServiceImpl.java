@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse updateUserChangeRole(Long id, UserChangeRoleRequest userChangeRoleRequest) {
+    public UserResponse updateUserChangeRole(long id, UserChangeRoleRequest userChangeRoleRequest) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
         user.setRole(userChangeRoleRequest.role());
@@ -42,8 +42,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(Long id) {
+    public void deleteUser(long id) {
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public User getLoggedInUser() {
+        // Find currently logged-in user:
+        String currentUsernameFromSecurityContext;
+        try{
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            currentUsernameFromSecurityContext = authentication.getName();
+        }catch(Exception e){
+            throw new UnauthorizedActionException("You are not authenticated. Please login (again).");
+        }
+
+        Optional<User> optionalUser = userRepository.findByUsername(currentUsernameFromSecurityContext);
+        if(optionalUser.isEmpty()){
+            throw new UnauthorizedActionException("User not found.");
+        }
+        return optionalUser.get();
     }
 
 }

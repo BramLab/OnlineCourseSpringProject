@@ -1,5 +1,10 @@
 package org.intecbrussel.onlinecoursespringproject.dto;
 
-public record EnrollmentResponse (
+import org.intecbrussel.onlinecoursespringproject.model.Course;
+import org.intecbrussel.onlinecoursespringproject.model.User;
 
+public record EnrollmentResponse (
+        long id,
+        CourseResponse courseResponse,
+        UserResponse userResponse
 ){}
