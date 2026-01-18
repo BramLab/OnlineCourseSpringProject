@@ -69,11 +69,11 @@ Content-Type: application/json
         client.assert(response.status === 400, "Username already exists.");
     });
 
-    // client.test("Duplicate register: Has error message", function() {
-    //     client.assert(response.body.message !== undefined, "Should have error message");
-    // });
-    //
-    // client.log("✓ Duplicate registration correctly rejected");
+    client.test("Duplicate register: Has error message", function() {
+        client.assert(response.body.message === "Username already exists.", "Should have error message");
+    });
+
+    client.log("✓ Duplicate registration correctly rejected");
 %}
 
 ### TEST 3: Login with valid credentials - Should succeed
@@ -122,11 +122,10 @@ Content-Type: application/json
     });
 
     client.test("Invalid login: Has error message", function() {
-        client.assert(response.body.message !== undefined, "Should have error message");
-        client.assert(response.body.message.includes("password"), "Error should mention password");
+        client.assert(response.body.message === "Invalid password", "Should have error message");
     });
 
-    client.log("✓ Invalid login correctly rejected");
+    //client.log("✓ Invalid login correctly rejected");
 %}
 
 ### TEST 5: Login with non-existent user - Should fail
