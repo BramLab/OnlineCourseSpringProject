@@ -39,6 +39,10 @@ public class UserConfig {
                     , passwordEncoder.encode("i2"));    //, clearTextToSHA256HashToBase64("i2"));
             userRepository.save(user_instructor2);
 
+            User user_instructor3 = new User(0, "user_instructor3", "user_instructor3@c.com", Role.INSTRUCTOR
+                    , passwordEncoder.encode("i3"));    //, clearTextToSHA256HashToBase64("i2"));
+            userRepository.save(user_instructor3);
+
             User user_student1 = new User(0, "user_student1", "user_student1@c.com", Role.STUDENT
                     , passwordEncoder.encode("s1"));
             userRepository.save(user_student1);
@@ -47,9 +51,17 @@ public class UserConfig {
                     , passwordEncoder.encode("s2"));
             userRepository.save(user_student2);
 
+            User user_student3 = new User(0, "user_student3", "user_student3@c.com", Role.STUDENT
+                    , passwordEncoder.encode("s3"));
+            userRepository.save(user_student3);
+
             User user_admin1 = new User(0, "user_admin1", "user_admin1@c.com", Role.ADMIN
                     , passwordEncoder.encode("a1"));
             userRepository.save(user_admin1);
+
+            User user_admin2 = new User(0, "user_admin2", "user_admin2@c.com", Role.ADMIN
+                    , passwordEncoder.encode("a2"));
+            userRepository.save(user_admin2);
 
 
             Course course_java = new Course(  0, "Java", "OOP, preparation for OCA", user_instructor1
@@ -58,6 +70,9 @@ public class UserConfig {
             Course course_tws = new Course(0, "Tws", "cv, brief, solliciteren", user_instructor2,
                     Date.valueOf("2026-09-02"), Date.valueOf("2026-10-01")  );
             courseRepository.save(course_tws);
+            Course course_html = new Course(0, "html", "front end", user_instructor3,
+                    Date.valueOf("2026-09-02"), Date.valueOf("2026-10-01")  );
+            courseRepository.save(course_html);
 
 
             Enrollment enrollment1 = new Enrollment(0, user_student1, course_java);

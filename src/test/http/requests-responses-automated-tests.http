@@ -513,3 +513,366 @@ Authorization: Bearer {{auth_token}}
 %}
 
 ###
+
+# ==================== ENROLLMENT TESTS ====================
+
+### ENROLL-SETUP: Login as different users for enrollment tests
+# @name login_for_enrollment
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "user_admin1",
+  "password": "a1"
+}
+
+> {%
+    client.global.set("admin_token", response.body.token);
+    client.global.set("admin_id", response.body.id);
+    client.log("✓ Admin logged in for enrollment tests");
+%}
+
+### ENROLL-SETUP: Login as Student
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "user_student1",
+  "password": "s1"
+}
+
+> {%
+    client.global.set("student_token", response.body.token);
+    client.global.set("student_id", response.body.id);
+    client.log("✓ Student logged in");
+%}
+
+### ENROLL-SETUP: Login as Student 2
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "user_student2",
+  "password": "s2"
+}
+
+> {%
+    client.global.set("student2_token", response.body.token);
+    client.global.set("student2_id", response.body.id);
+    client.log("✓ Student 2 logged in");
+%}
+
+### ENROLL-SETUP: Login as Instructor
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "user_instructor1",
+  "password": "i1"
+}
+
+> {%
+    client.global.set("instructor_token", response.body.token);
+    client.global.set("instructor_id", response.body.id);
+    client.log("✓ Instructor logged in");
+%}
+
+### ENROLL-SETUP: Get available course for testing
+GET http://localhost:8080/api/courses
+
+> {%
+    if (response.body.length > 0) {
+        client.global.set("test_course_for_enrollment", response.body[0].id);
+        client.log("✓ Found course ID: " + response.body[0].id);
+    }
+%}
+
+# ==================== ENROLLMENT CREATION TESTS ====================
+
+### TEST-ENROLL-1: Student enrolls self in course - Should succeed
+POST http://localhost:8080/api/courses/{{test_course_for_enrollment}}/enroll
+Authorization: Bearer {{student_token}}
+
+> {%
+    client.test("Student self-enroll: Status is 200", function() {
+        client.assert(response.status === 200, "Expected status 200");
+    });
+
+    client.test("Student self-enroll: Returns enrollment", function() {
+        client.assert(response.body.id !== undefined, "Should have enrollment ID");
+        client.assert(response.body.courseResponse !== undefined, "Should have course info");
+        client.assert(response.body.userResponse !== undefined, "Should have user info");
+    });
+
+    client.global.set("test_enrollment_id", response.body.id);
+    //client.log("✓ Student enrolled successfully, enrollment ID: " + response.body.id);
+%}
+
+### TEST-ENROLL-2: Student tries to enroll again - Should fail (duplicate)
+POST http://localhost:8080/api/courses/{{test_course_for_enrollment}}/enroll
+Authorization: Bearer {{student_token}}
+
+> {%
+    client.test("Duplicate enrollment: Should return 400", function() {
+        client.assert(response.status === 400, "Expected status 400");
+    });
+
+    client.test("Duplicate enrollment: Has error message", function() {
+        client.assert(response.body.message !== undefined, "Should have error message");
+        client.assert(response.body.message.includes("already enrolled"), "Error should mention already enrolled");
+    });
+
+    //client.log("✓ Duplicate enrollment correctly rejected");
+%}
+
+### TEST-ENROLL-3: Student tries to enroll without auth - Should fail
+POST http://localhost:8080/api/courses/{{test_course_for_enrollment}}/enroll
+
+> {%
+    client.test("Enrollment without auth: Should return 401 or 403", function() {
+        client.assert(response.status === 401 || response.status === 403, "Expected 401 or 403");
+    });
+
+    client.log("✓ Unauthorized enrollment correctly rejected");
+%}
+
+### TEST-ENROLL-4: Admin enrolls another student - Should succeed
+POST http://localhost:8080/api/courses/{{test_course_for_enrollment}}/enroll/{{student2_id}}
+Authorization: Bearer {{admin_token}}
+
+> {%
+    client.test("Admin enrolls student: Status is 200", function() {
+        client.assert(response.status === 200, "Expected status 200");
+    });
+
+    client.test("Admin enrolls student: Returns enrollment", function() {
+        client.assert(response.body.id !== undefined, "Should have enrollment ID");
+        client.assert(response.body.userResponse.id === parseInt(client.global.get("student2_id")), "Should be student2");
+    });
+
+    client.global.set("test_enrollment_id_2", response.body.id);
+    client.log("✓ Admin enrolled student2 successfully");
+%}
+
+### TEST-ENROLL-5: Instructor tries to enroll student - Should fail
+POST http://localhost:8080/api/courses/{{test_course_for_enrollment}}/enroll
+Authorization: Bearer {{instructor_token}}
+
+> {%
+    client.test("Instructor enrollment: Should return 403", function() {
+        client.assert(response.status === 403, "Expected status 403");
+    });
+
+    client.log("✓ Instructor enrollment correctly rejected");
+%}
+
+### TEST-ENROLL-6: Student tries to enroll in non-existent course - Should fail
+POST http://localhost:8080/api/courses/99999/enroll
+Authorization: Bearer {{student_token}}
+
+> {%
+    client.test("Enroll in non-existent course: Should return 404", function() {
+        client.assert(response.status === 404, "Expected status 404");
+    });
+
+    client.test("Non-existent course: Has error message", function() {
+        client.assert(response.body.message !== undefined, "Should have error message");
+    });
+
+    client.log("✓ Enrollment in non-existent course correctly rejected");
+%}
+
+# ==================== ENROLLMENT LISTING TESTS ====================
+
+### TEST-ENROLL-7: Student views own enrollments - Should succeed
+GET http://localhost:8080/api/enrollments/me
+Authorization: Bearer {{student_token}}
+
+> {%
+    client.test("Student view enrollments: Status is 200", function() {
+        client.assert(response.status === 200, "Expected status 200");
+    });
+
+    client.test("Student view enrollments: Returns array", function() {
+        client.assert(Array.isArray(response.body), "Response should be an array");
+        client.assert(response.body.length > 0, "Student should have at least one enrollment");
+    });
+
+    client.test("Student view enrollments: Only sees own", function() {
+        response.body.forEach(enrollment => {
+            client.assert(enrollment.userResponse.id === parseInt(client.global.get("student_id")),
+                "All enrollments should belong to logged-in student");
+        });
+    });
+
+    client.log("✓ Student retrieved " + response.body.length + " enrollment(s)");
+%}
+
+### TEST-ENROLL-8: Student tries to view all enrollments (admin endpoint) - Should fail
+GET http://localhost:8080/api/admin/enrollments
+Authorization: Bearer {{student_token}}
+
+> {%
+    client.test("Student view admin enrollments: Should return 403", function() {
+        client.assert(response.status === 403, "Expected status 403");
+    });
+
+    client.log("✓ Student admin access correctly rejected");
+%}
+
+### TEST-ENROLL-9: Instructor views enrollments for own courses - Should succeed
+GET http://localhost:8080/api/instructor/enrollments
+Authorization: Bearer {{instructor_token}}
+
+> {%
+    client.test("Instructor view enrollments: Status is 200", function() {
+        client.assert(response.status === 200, "Expected status 200");
+    });
+
+    client.test("Instructor view enrollments: Returns array", function() {
+        client.assert(Array.isArray(response.body), "Response should be an array");
+    });
+
+    client.log("✓ Instructor retrieved " + response.body.length + " enrollment(s)");
+%}
+
+### TEST-ENROLL-10: Admin views all enrollments - Should succeed
+GET http://localhost:8080/api/admin/enrollments
+Authorization: Bearer {{admin_token}}
+
+> {%
+    client.test("Admin view all enrollments: Status is 200", function() {
+        client.assert(response.status === 200, "Expected status 200");
+    });
+
+    client.test("Admin view all enrollments: Returns array", function() {
+        client.assert(Array.isArray(response.body), "Response should be an array");
+        client.assert(response.body.length >= 2, "Should have at least 2 enrollments from setup");
+    });
+
+    client.test("Admin view all enrollments: Has correct structure", function() {
+        const enrollment = response.body[0];
+        client.assert(enrollment.id !== undefined, "Should have enrollment ID");
+        client.assert(enrollment.courseResponse !== undefined, "Should have course info");
+        client.assert(enrollment.userResponse !== undefined, "Should have student info");
+    });
+
+    client.log("✓ Admin retrieved " + response.body.length + " total enrollment(s)");
+%}
+
+### TEST-ENROLL-11: Unauthenticated user tries to view enrollments - Should fail
+GET http://localhost:8080/api/enrollments/me
+
+> {%
+    client.test("Unauthenticated view enrollments: Should return 401 or 403", function() {
+        client.assert(response.status === 401 || response.status === 403, "Expected 401 or 403");
+    });
+
+    client.log("✓ Unauthenticated enrollment view correctly rejected");
+%}
+
+# ==================== ENROLLMENT DELETION TESTS ====================
+
+### TEST-ENROLL-12: Student cancels own enrollment - Should succeed
+DELETE http://localhost:8080/api/enrollments/{{test_enrollment_id}}
+Authorization: Bearer {{student_token}}
+
+> {%
+    client.test("Student cancel enrollment: Status is 200", function() {
+        client.assert(response.status === 200, "Expected status 200");
+    });
+
+    client.log("✓ Student successfully canceled enrollment");
+%}
+
+### TEST-ENROLL-13: Verify enrollment deleted
+GET http://localhost:8080/api/enrollments/me
+Authorization: Bearer {{student_token}}
+
+> {%
+    client.test("Deleted enrollment: Should not appear in list", function() {
+        const deleted = response.body.find(e => e.id === parseInt(client.global.get("test_enrollment_id")));
+        client.assert(deleted === undefined, "Deleted enrollment should not appear");
+    });
+
+    client.log("✓ Enrollment deletion confirmed");
+%}
+
+### TEST-ENROLL-14: Student tries to cancel another student's enrollment - Should fail
+DELETE http://localhost:8080/api/enrollments/{{test_enrollment_id_2}}
+Authorization: Bearer {{student_token}}
+
+> {%
+    client.test("Cancel other's enrollment: Should return 403", function() {
+        client.assert(response.status === 403, "Expected status 403");
+    });
+
+    client.log("✓ Cannot cancel other student's enrollment");
+%}
+
+### TEST-ENROLL-15: Admin cancels any enrollment - Should succeed
+DELETE http://localhost:8080/api/enrollments/{{test_enrollment_id_2}}
+Authorization: Bearer {{admin_token}}
+
+> {%
+    client.test("Admin cancel enrollment: Status is 200", function() {
+        client.assert(response.status === 200, "Expected status 200");
+    });
+
+    client.log("✓ Admin successfully canceled enrollment");
+%}
+
+### TEST-ENROLL-16: Try to cancel non-existent enrollment - Should fail
+DELETE http://localhost:8080/api/enrollments/99999
+Authorization: Bearer {{admin_token}}
+
+> {%
+    client.test("Cancel non-existent enrollment: Should return 404", function() {
+        client.assert(response.status === 404, "Expected status 404");
+    });
+
+    client.log("✓ Non-existent enrollment cancel correctly rejected");
+%}
+
+### TEST-ENROLL-17: Instructor tries to cancel enrollment - Should fail
+DELETE http://localhost:8080/api/enrollments/1
+Authorization: Bearer {{instructor_token}}
+
+> {%
+    client.test("Instructor cancel enrollment: Should return 403", function() {
+        client.assert(response.status === 403, "Expected status 403");
+    });
+
+    client.log("✓ Instructor cannot cancel enrollments");
+%}
+
+# ==================== ENROLLMENT EDGE CASES ====================
+
+### TEST-ENROLL-18: Re-enroll student after cancellation - Should succeed
+POST http://localhost:8080/api/courses/{{test_course_for_enrollment}}/enroll
+Authorization: Bearer {{student_token}}
+
+> {%
+    client.test("Re-enrollment: Status is 200", function() {
+        client.assert(response.status === 200, "Expected status 200");
+    });
+
+    client.test("Re-enrollment: Creates new enrollment", function() {
+        client.assert(response.body.id !== undefined, "Should have new enrollment ID");
+        client.assert(response.body.id !== parseInt(client.global.get("test_enrollment_id")),
+            "Should be different from deleted enrollment");
+    });
+
+    client.log("✓ Re-enrollment after cancellation successful");
+%}
+
+### TEST-ENROLL-CLEANUP: Final cleanup
+GET http://localhost:8080/api/admin/enrollments
+Authorization: Bearer {{admin_token}}
+
+> {%
+    client.log("=== Enrollment Tests Completed ===");
+    client.log("Final enrollment count: " + response.body.length);
+%}
+
+###

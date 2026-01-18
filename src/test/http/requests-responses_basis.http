@@ -134,14 +134,20 @@ Authorization: Bearer {{auth_token}}
 # ==================== ENROLLMENT ENDPOINTS ====================
 #    //EnrollmentController
 #    //Methode Endpoint Auth
-#    //POST    /api/courses/{id}/enroll    STUDENT/ADMIN           08
+#    //POST    /api/courses/{id}/enroll    STUDENT/ADMIN      08S/08A
 #    //GET     /api/enrollments/me         STUDENT                 09
 #    //GET     /api/instructor/enrollments INSTRUCTOR              10
 #    //GET     /api/admin/enrollments      ADMIN                   11
 #    //DELETE /api/enrollments/{id}        STUDENT (self) / ADMIN  12
 
-### 08 STUDENT/ADMIN
-POST http://localhost:8080/api/courses/{{id}}/enroll
+### 08S student enrolls self.
+POST http://localhost:8080/api/courses/6/enroll
+Authorization: Bearer {{student_token}}
+
+
+### 08A Admin enrolls student
+POST http://localhost:8080/api/courses/3/enroll/6
+
 
 ### 09 STUDENT          Response code: 403
 GET http://localhost:8080/api/enrollments/me
@@ -185,8 +191,8 @@ POST http://localhost:8080/api/auth/login
 Content-Type: application/json
 
 {
-  "username": "user_student1",
-  "password": "s1"
+  "username": "user_student3",
+  "password": "s3"
 }
 
 > {%
