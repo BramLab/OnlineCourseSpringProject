@@ -37,24 +37,52 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
     @Override
     @Transactional
-    public EnrollmentResponse createEnrollment(long courseId, long studentId) {
-        //Enroll student in course (student self of admin)
-        User loggedInUser = userService.getLoggedInUser();
+    public EnrollmentResponse createEnrollmentForStudent(long courseId, long studentId) {
+        User currentlyLoggedInUser = userService.getLoggedInUser();
 
-        User studentToEnroll = userRepository.findById(studentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
+        User student = userRepository.findById(studentId)
+                .orElseThrow(()->new ResourceNotFoundException("Student not found"));
 
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
 
-        if(!(   (loggedInUser.getRole() == Role.ADMIN) ||
-                (loggedInUser.getRole() == Role.STUDENT && loggedInUser.equals(studentToEnroll) )
-        )){
-            throw new UnauthorizedActionException("You must either have role ADMIN, " +
-                    "or be STUDENT and be logged-in.");
+        if(currentlyLoggedInUser.getRole() != Role.ADMIN) {
+            throw new UnauthorizedActionException("You must have role ADMIN.");
         }
 
-        Enrollment enrollment = enrollmentRepository.save(new Enrollment(0, studentToEnroll, course));
+        List<Enrollment> enrollmentsForStudent = enrollmentRepository.findForStudent(studentId);
+        for (Enrollment enrollment : enrollmentsForStudent){
+            if (enrollment.getCourse().getId() == course.getId()){
+                throw new UnauthorizedActionException("You are already enrolled in this course.");
+            }
+        }
+
+        Enrollment enrollment = enrollmentRepository.save(new Enrollment(0, student, course));
+        return EnrollmentMapper.mapToEnrollmentResponse(enrollment);
+    }
+
+    @Override
+    @Transactional
+    public EnrollmentResponse createEnrollmentForLoggedInUser(long courseId) {
+        User loggedInUser = userService.getLoggedInUser();
+
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
+
+        if(loggedInUser.getRole() != Role.STUDENT) {
+            throw new UnauthorizedActionException("You must be STUDENT and be logged-in.");
+        }
+
+        List<Enrollment> enrollmentsForStudent = enrollmentRepository.findForStudent(loggedInUser.getId());
+        for (Enrollment enrollment : enrollmentsForStudent){
+            if (enrollment.getCourse().getId() == course.getId()){
+                throw new UnauthorizedActionException("You are already enrolled in this course.");
+            }
+        }
+
+        Enrollment enrollment = enrollmentRepository.save(
+                new Enrollment(0, loggedInUser, course)
+        );
         return EnrollmentMapper.mapToEnrollmentResponse(enrollment);
     }
 

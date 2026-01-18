@@ -29,12 +29,18 @@ public class EnrollmentController {
     //GET     /api/admin/enrollments      ADMIN                   11
     //DELETE /api/enrollments/{id}        STUDENT (self) / ADMIN  12
 
-    @PostMapping("/courses/{id}/enroll")
-    @PreAuthorize("hasAnyRole('STUDENT','ADMIN')")
-    public EnrollmentResponse enroll(@PathVariable Long id, Authentication auth) {
-        Long userId = Long.valueOf(auth.getName()); // adjust if your principal not ID
-        return enrollmentService.createEnrollment(id, userId);
+    @PostMapping("/courses/{course_id}/enroll/{student_id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public EnrollmentResponse enrollStudentAsAdmin(@PathVariable Long course_id, @PathVariable Long student_id) {
+        return enrollmentService.createEnrollmentForStudent(course_id, student_id);
     }
+
+    @PostMapping("/courses/{course_id}/enroll")
+    @PreAuthorize("hasAnyRole('STUDENT')")
+    public EnrollmentResponse enrollSelf(@PathVariable Long course_id) {
+        return enrollmentService.createEnrollmentForLoggedInUser(course_id);
+    }
+
 
     // These 3 mappings can probably be combined. No time to research. Later.
     //GET /api  /instructor/enrollments INSTRUCTOR

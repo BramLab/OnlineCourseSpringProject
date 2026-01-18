@@ -32,13 +32,6 @@ public class GlobalExceptionHandler {
                 .body(error);
     }
 
-    @ExceptionHandler({RuntimeException.class})
-    public ResponseEntity<Object> handleRuntimeException(RuntimeException exception) {
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(exception.getMessage());
-    }
-
     // Validation errors
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(
@@ -62,6 +55,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(error);
+    }
+
+    // Must be last.
+    @ExceptionHandler({RuntimeException.class})
+    public ResponseEntity<Object> handleRuntimeException(RuntimeException exception) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(exception.getMessage());
     }
 
 }
