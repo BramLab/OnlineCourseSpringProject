@@ -1,5 +1,6 @@
 @startuml
 'layout: control order of packages left-right
+
 'https://stackoverflow.com/questions/72375477/plantuml-rearrangement-of-components-and-packages
 
 left to right direction
@@ -25,8 +26,8 @@ package "packageD" {
   [componentD]
 }
 
-[componentA] --> componentB1
-componentA --> componentC1
+[componentA] --> [componentB1]
+componentA --> [componentC1]
 componentB2 --> [componentD]
 componentC2 --> [componentD]
 @enduml

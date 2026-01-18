@@ -132,21 +132,28 @@ Authorization: Bearer {{auth_token}}
 
 
 # ==================== ENROLLMENT ENDPOINTS ====================
-### 10
-GET http://localhost:8080/api/admin/enrollments
+#    //EnrollmentController
+#    //Methode Endpoint Auth
+#    //POST    /api/courses/{id}/enroll    STUDENT/ADMIN           08
+#    //GET     /api/enrollments/me         STUDENT                 09
+#    //GET     /api/instructor/enrollments INSTRUCTOR              10
+#    //GET     /api/admin/enrollments      ADMIN                   11
+#    //DELETE /api/enrollments/{id}        STUDENT (self) / ADMIN  12
 
-### 08
+### 08 STUDENT/ADMIN
 POST http://localhost:8080/api/courses/{{id}}/enroll
 
-### 09
+### 09 STUDENT          Response code: 403
 GET http://localhost:8080/api/enrollments/me
 
-### 12
-DELETE http://localhost:8080/api/enrollments/{{enrollmentId}}
+### 10 INSTRUCTOR       Response code: 403
+GET http://localhost:8080/api/admin/enrollments
 
-### 11
+### 11 ADMIN            Response code: 403
 GET http://localhost:8080/api/instructor/enrollments
 
+### 12 STUDENT (self) / ADMIN
+DELETE http://localhost:8080/api/enrollments/{{enrollmentId}}
 
 
 # ==================== QUICK TEST SEQUENCE ====================

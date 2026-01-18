@@ -1,81 +1,84 @@
 @startuml
 skinparam componentStyle rectangle
 
+
 skinparam package<<Layout>> {
-  borderColor Transparent
-  backgroundColor Transparent
-'  fontColor Transparent
-  stereotypeFontColor Transparent
+    borderColor Transparent
+    backgroundColor Transparent
+    '  fontColor Transparent
+    stereotypeFontColor Transparent
 }
 
-
-package users {
-    :Visitor:
-    :Admin:         as adm
-    :Instructor:    as ins
-    :Student:       as stu
+package users <<Layout>> {
+    :Visitor: -[hidden]r- :Admin:
+    :Admin: -[hidden]r- :Instructor:
+    :Instructor: -[hidden]r- :Student:
 }
 
 package Controllers <<Layout>> {
-
-    package AuthController {
-        [POST \n/api/auth/register] as register
-        [POST \n/api/auth/login] as login
-    }
-
-    package CourseController {
-        [GET \n/api/courses] as course1
-        [GET \n/api/courses/{id}] as course2
-        [POST \n/api/courses] as course3
-        [PUT  \n/api/courses/{id}] as course4
-        [DELETE \n/api/courses/{id}] as course5
-    }
-    package EnrollmentController {
-        [enrol1]
-    }
 
     package AdminController {
         [admin1]
     }
 
+    package EnrollmentController {
+        [enrol1]
+    }
+
+    package CourseController {
+        [GET \n/api/courses]        -[hidden]r- [GET \n/api/courses/{id}]
+        [GET \n/api/courses/{id}]   -[hidden]r- [POST \n/api/courses]
+        [POST \n/api/courses]       -[hidden]r- [PUT  \n/api/courses/{id}]
+        [PUT  \n/api/courses/{id}]  -[hidden]r- [DELETE \n/api/courses/{id}]
+    }
+
+    package AuthController {
+        [POST \n/api/auth/register] -[hidden]r- [POST \n/api/auth/login]
+    }
+
 }
 
 package Services <<Layout>> {
-    package AuthService {
-      [AuthService.registerUser]
-      [AuthService.login]
-      [AuthService.GetAllUsers]
+
+    package EnrollmentService {
+        [ietsEnroll]
     }
 
     package CourseService {
-      [CreateCourse]
+        [CreateCourse]
     }
 
-    package EnrollmentService {
-      [ietsEnroll]
+    package AuthService {
+        [AuthService.registerUser]
+        [AuthService.login]
+        [AuthService.GetAllUsers]
     }
 
 }
 
 package repositories <<Layout>> {
-    'package CourseRepository
     [CourseRepository]
-    package UserRepository
-    package EnrollmentRepository
-    package CustomEnrollmentRepository
+    [UserRepository]
+    [EnrollmentRepository]
+    [CustomEnrollmentRepository]
 }
 
-' Hidden connections horizontal:
-' Use hidden right connections to encourage the rectangles
-' within each layer to be placed in the desired order.
-Visitor -[hidden]r- adm
-adm -[hidden]r- ins
-ins -[hidden]r- stu
+' LAYOUT Hidden connections horizontal:
+' place rectangles per layer in desired order.
 
-register -[hidden]r- login
-login -[hidden]r- course1
+'controller
+[POST \n/api/auth/login]        -[hidden]r- [GET \n/api/courses]
+[DELETE \n/api/courses/{id}]    -[hidden]r- [enrol1]
 
-' Hidden connections vertical:
+'service
+[AuthService.registerUser]  -[hidden]r- [AuthService.login]
+[AuthService.login]         -[hidden]r- [AuthService.GetAllUsers]
+
+[UserRepository]            -[hidden]r- [CourseRepository]
+[CourseRepository]          -[hidden]r- [EnrollmentRepository]
+[EnrollmentRepository]      -[hidden]r- [CustomEnrollmentRepository]
+
+' LAYOUT Hidden connections vertical:
 ' Use hidden down connections between the first rectangle in each
 ' layer to encourage all the layers to be left-aligned.
 ' NOTE: Use longer arrows to force more space between the layers, so
@@ -83,14 +86,11 @@ login -[hidden]r- course1
 ' NOTE: Since we later create a *visible* connection from Comp20 to
 ' Comp10, we omit create a hidden connection here, otherwise the
 ' visible connection ends up curving to avoid the hidden one.
-Visitor -[hidden]d-- register
-register -[hidden]d-- registerUser
-Comp30 -[hidden]d-- Comp20
-'Comp20 -[hidden]d-- Comp10
+Visitor                     -[hidden]d- [POST \n/api/auth/register]
+[POST \n/api/auth/register] -[hidden]d- AuthService.registerUser
+AuthService.registerUser    -[hidden]d- UserRepository
 
-' Visible connections
-' -------------------
-
+' Visible connections:
 ' NOTE: Use norank to prevent these visible connections from taking
 ' prescedence over the hidden connections and breaking the layout,
 ' *except* for the visible connections which are equivalent to the

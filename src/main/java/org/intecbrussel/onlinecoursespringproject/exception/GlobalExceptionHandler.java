@@ -13,11 +13,23 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+
+    @ExceptionHandler({MissingDataException.class})
+    public ResponseEntity<Map<String, String>> handleMissingDataException(MissingDataException exception) {
+        Map<String, String> error = new HashMap<>();
+        error.put("message", exception.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(error);
+    }
+
     @ExceptionHandler({ResourceNotFoundException.class})
-    public ResponseEntity<Object> handleResourceNotFoundException(ResourceNotFoundException exception) {
+    public ResponseEntity<Map<String, String>> handleResourceNotFoundException(ResourceNotFoundException exception) {
+        Map<String, String> error = new HashMap<>();
+        error.put("message", exception.getMessage());
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
-                .body(exception.getMessage());
+                .body(error);
     }
 
     @ExceptionHandler({RuntimeException.class})

@@ -149,6 +149,7 @@ Content-Type: application/json
     client.log("✓ Non-existent user login correctly rejected");
 %}
 
+###
 # ==================== COURSE TESTS (PUBLIC) ====================
 
 ### TEST 6: Get all courses (public) - Should succeed
@@ -332,8 +333,11 @@ Authorization: Bearer {{instructor_token}}
         client.assert(response.body.title === "Updated Test Course", "Title should be updated");
     });
 
-    client.log("✓ Course updated successfully");
+    //client.log("✓ Course updated successfully");
 %}
+
+### TEST 13B: Update OTHER instructor's course as Instructor - Should NOT succeed
+# todo
 
 ### TEST 14: Login as Student
 # @name login_student

@@ -1,9 +1,6 @@
 package org.intecbrussel.onlinecoursespringproject.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 @EqualsAndHashCode(callSuper = true)
@@ -18,6 +15,10 @@ public class User extends AuditModel {
 
     private String username;
     private String email;
+
+    // https://stackoverflow.com/questions/67825729/using-enums-in-a-spring-entity
+    @Enumerated(EnumType.STRING)
+    @Column(name="role")
     private Role role;
     private String passwordHashed;
 }

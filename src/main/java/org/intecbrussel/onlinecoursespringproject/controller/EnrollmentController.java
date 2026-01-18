@@ -46,14 +46,14 @@ public class EnrollmentController {
 
     //GET /api  /enrollments/me STUDENT
     @GetMapping("/enrollments/me")
-    @PreAuthorize("hasRole('INSTRUCTOR')")
+    @PreAuthorize("hasRole('STUDENT')")
     public List<EnrollmentResponse> getEnrollmentsForStudent() {
         return enrollmentService.listEnrollments();
     }
 
     //GET /api  /admin/enrollments ADMIN
     @GetMapping("/admin/enrollments")
-    @PreAuthorize("hasRole('INSTRUCTOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<EnrollmentResponse> getAllEnrollments() {
         return enrollmentService.listEnrollments();
     }
