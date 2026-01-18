@@ -11,12 +11,8 @@ import org.intecbrussel.onlinecoursespringproject.model.Role;
 import org.intecbrussel.onlinecoursespringproject.model.User;
 import org.intecbrussel.onlinecoursespringproject.repository.CourseRepository;
 import org.intecbrussel.onlinecoursespringproject.repository.UserRepository;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service

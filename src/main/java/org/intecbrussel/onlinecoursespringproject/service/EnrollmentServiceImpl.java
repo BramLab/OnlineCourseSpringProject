@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.intecbrussel.onlinecoursespringproject.dto.EnrollmentMapper;
 import org.intecbrussel.onlinecoursespringproject.dto.EnrollmentResponse;
-import org.intecbrussel.onlinecoursespringproject.dto.UserMapper;
 import org.intecbrussel.onlinecoursespringproject.exception.ResourceNotFoundException;
 import org.intecbrussel.onlinecoursespringproject.exception.UnauthorizedActionException;
 import org.intecbrussel.onlinecoursespringproject.model.Course;
@@ -12,7 +11,6 @@ import org.intecbrussel.onlinecoursespringproject.model.Enrollment;
 import org.intecbrussel.onlinecoursespringproject.model.Role;
 import org.intecbrussel.onlinecoursespringproject.model.User;
 import org.intecbrussel.onlinecoursespringproject.repository.CourseRepository;
-import org.intecbrussel.onlinecoursespringproject.repository.CustomEnrollmentRepository;
 import org.intecbrussel.onlinecoursespringproject.repository.EnrollmentRepository;
 import org.intecbrussel.onlinecoursespringproject.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -29,7 +27,6 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
     private final UserService userService;
-    //private final CustomEnrollmentRepository customEnrollmentRepository;
 
     //Enroll student in course (student self of admin)
     //• List enrollments:

@@ -1,7 +1,6 @@
 package org.intecbrussel.onlinecoursespringproject.dto;
 
 import org.intecbrussel.onlinecoursespringproject.model.Course;
-import org.intecbrussel.onlinecoursespringproject.model.Role;
 
 public class CourseMapper {
 

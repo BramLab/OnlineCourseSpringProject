@@ -2,8 +2,6 @@ package org.intecbrussel.onlinecoursespringproject.service;
 
 import org.intecbrussel.onlinecoursespringproject.dto.*;
 
-import java.util.List;
-
 // create, update, delete, getById, getAll, (getByRole)
 public interface AuthService {
     UserResponse registerUser(RegisterRequest registerRequest);

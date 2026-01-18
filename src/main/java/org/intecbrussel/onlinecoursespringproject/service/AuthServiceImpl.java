@@ -22,13 +22,6 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    // replaced by @RequiredArgsConstructor
-    //    public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
-    //        this.userRepository = userRepository;
-    //        this.passwordEncoder = passwordEncoder;
-    //        this.jwtUtil = jwtUtil;
-    //    }
-
     @Override
     public UserResponse registerUser(RegisterRequest registerRequest) {
         User newUser = new User();
