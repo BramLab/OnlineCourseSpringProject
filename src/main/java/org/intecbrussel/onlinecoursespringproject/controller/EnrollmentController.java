@@ -30,34 +30,34 @@ public class EnrollmentController {
     //DELETE /api/enrollments/{id}        STUDENT (self) / ADMIN  12
 
     @PostMapping("/courses/{course_id}/enroll/{student_id}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public EnrollmentResponse enrollStudentAsAdmin(@PathVariable Long course_id, @PathVariable Long student_id) {
         return enrollmentService.createEnrollmentForStudent(course_id, student_id);
     }
 
     @PostMapping("/courses/{course_id}/enroll")
-    @PreAuthorize("hasAnyRole('STUDENT')")
+    @PreAuthorize("hasRole('STUDENT')")
     public EnrollmentResponse enrollSelf(@PathVariable Long course_id) {
         return enrollmentService.createEnrollmentForLoggedInUser(course_id);
     }
 
 
     // These 3 mappings can probably be combined. No time to research. Later.
-    //GET /api  /instructor/enrollments INSTRUCTOR
+    //GET     /api/instructor/enrollments INSTRUCTOR              10
     @GetMapping("/instructor/enrollments")
     @PreAuthorize("hasRole('INSTRUCTOR')")
     public List<EnrollmentResponse> getEnrollmentsForInstructor() {
         return enrollmentService.listEnrollments();
     }
 
-    //GET /api  /enrollments/me STUDENT
+    //GET     /api/enrollments/me         STUDENT                 09
     @GetMapping("/enrollments/me")
     @PreAuthorize("hasRole('STUDENT')")
     public List<EnrollmentResponse> getEnrollmentsForStudent() {
         return enrollmentService.listEnrollments();
     }
 
-    //GET /api  /admin/enrollments ADMIN
+    //GET     /api/admin/enrollments      ADMIN                   11
     @GetMapping("/admin/enrollments")
     @PreAuthorize("hasRole('ADMIN')")
     public List<EnrollmentResponse> getAllEnrollments() {
