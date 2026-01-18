@@ -16,6 +16,7 @@ public class AuthController {
 
     private final AuthService authService;
 
+
     @PostMapping("/register")
     public UserResponse register(@Valid @RequestBody RegisterRequest registerRequest) {
         return authService.registerUser(registerRequest);

@@ -55,6 +55,7 @@ Inschr bekijken                     S(self) I(own)      A
 Users beheren                                           A
 Belangrijk: “(self)” betekent: enkel eigen gegevens.
 
+
 3. Model (Cursisten maken deze zelf)
 
 A) AuditModel (verplicht)
@@ -72,6 +73,7 @@ D) Enrollment
 Velden:
 • id, student (User), course, enrollmentDate
 
+
 4. TE MAKEN DOOR CURSISTEN
 
 A) Repository-laag
@@ -87,6 +89,7 @@ Maak minimaal:
 • CourseRequest / CourseResponse
 • EnrollmentResponse
 Opmerking: Password nooit teruggeven in responses.
+
 
 C) Service-laag
 
@@ -111,34 +114,35 @@ EnrollmentService
     o admin ziet alles
 • Cancel enrollment (student self of admin)
 
+
 D) Controller-laag
 
 AuthController (public)
 Methode Endpoint
-POST    /api/auth/register
-POST    /api/auth/login
+POST    /api/auth/register                                  01
+POST    /api/auth/login                                     02
 
 CourseController
 Methode Endpoint            Auth
-GET     /api/courses        public
-GET     /api/courses/{id}   public
-POST    /api/courses        INSTRUCTOR/ADMIN
-PUT     /api/courses/{id}   INSTRUCTOR (own) / ADMIN
-DELETE  /api/courses/{id}   ADMIN
+GET     /api/courses        public                          03
+GET     /api/courses/{id}   public                          04
+POST    /api/courses        INSTRUCTOR/ADMIN                05
+PUT     /api/courses/{id}   INSTRUCTOR (own) / ADMIN        06
+DELETE  /api/courses/{id}   ADMIN                           07
 
 EnrollmentController
 Methode Endpoint Auth
-POST    /api/courses/{id}/enroll    STUDENT/ADMIN
-GET     /api/enrollments/me         STUDENT
-GET     /api/instructor/enrollments INSTRUCTOR
-GET     /api/admin/enrollments      ADMIN
-DELETE /api/enrollments/{id}        STUDENT (self) / ADMIN
+POST    /api/courses/{id}/enroll    STUDENT/ADMIN           08
+GET     /api/enrollments/me         STUDENT                 09
+GET     /api/instructor/enrollments INSTRUCTOR              10
+GET     /api/admin/enrollments      ADMIN                   11
+DELETE /api/enrollments/{id}        STUDENT (self) / ADMIN  12
 
 AdminController (admin only)
 Methode Endpoint
-GET     /api/admin/users
-PUT     /api/admin/users/{id}/role
-DELETE  /api/admin/users/{id}
+GET     /api/admin/users                                    13
+PUT     /api/admin/users/{id}/role                          14
+DELETE  /api/admin/users/{id}                               15
 
 5. Security package (VERPLICHT)
 
@@ -158,6 +162,7 @@ Exception Handling (VERPLICHT)
 • GlobalExceptionHandler met nette JSON errors
 
 7. BOOTSTRAP – DataLoader (VERPLICHT)
+
 
 Vereisten
 1. Seed data bij opstarten, enkel als DB leeg is

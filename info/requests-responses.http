@@ -1,6 +1,31 @@
+#D) Controller-laag
+#
+#AuthController (public)
+#POST    /api/auth/register                                      01
+#POST    /api/auth/login                                         02
+#
+#CourseController
+#GET     /api/courses        public                              03
+#GET     /api/courses/{id}   public                              04
+#POST    /api/courses        INSTRUCTOR/ADMIN                    05
+#PUT     /api/courses/{id}   INSTRUCTOR (own) / ADMIN            06
+#DELETE  /api/courses/{id}   ADMIN                               07
+#
+#EnrollmentController
+#POST    /api/courses/{id}/enroll    STUDENT/ADMIN               08
+#GET     /api/enrollments/me         STUDENT                     09
+#GET     /api/instructor/enrollments INSTRUCTOR                  10
+#GET     /api/admin/enrollments      ADMIN                       11
+#DELETE /api/enrollments/{id}        STUDENT (self) / ADMIN      12
+#
+#AdminController (admin only)
+#GET     /api/admin/users                                        13
+#PUT     /api/admin/users/{id}/role                              14
+#DELETE  /api/admin/users/{id}                                   15
+
 # ==================== AUTHENTICATION ====================
 
-### Register a new user
+### 01 Register a new user
 POST http://localhost:8080/api/auth/register
 Content-Type: application/json
 
@@ -12,7 +37,7 @@ Content-Type: application/json
   "password": "password123"
 }
 
-### Login and capture token
+### 02 Login and capture token
 # @name login
 POST http://localhost:8080/api/auth/login
 Content-Type: application/json
@@ -27,7 +52,7 @@ Content-Type: application/json
     client.log("Token saved: " + response.body.token);
 %}
 
-### Alternative: Login as existing user
+### 02 Alternative: Login as existing user
 # @name loginExisting
 POST http://localhost:8080/api/auth/login
 Content-Type: application/json
@@ -42,13 +67,14 @@ Content-Type: application/json
     client.log("Token saved: " + response.body.token);
 %}
 
+###
 # ==================== ADMIN ENDPOINTS ====================
 
-### Get all users (uses captured token)
+### 13 Get all users (uses captured token)
 GET http://localhost:8080/api/admin/users
 Authorization: Bearer {{auth_token}}
 
-### Update user role (uses captured token)
+### 14 Update user role (uses captured token)
 PUT http://localhost:8080/api/admin/users/5/role
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
@@ -58,19 +84,19 @@ Authorization: Bearer {{auth_token}}
   "role": "INSTRUCTOR"
 }
 
-### Delete user (uses captured token)
+### 15 Delete user (uses captured token) => invalidates current token!
 DELETE http://localhost:8080/api/admin/users/6
 Authorization: Bearer {{auth_token}}
 
 # ==================== COURSE ENDPOINTS ====================
 
-### Get all courses (public - no auth needed)
+### 03 Get all courses (public - no auth needed)
 GET http://localhost:8080/api/courses
 
-### Get course by ID (public - no auth needed)
+### 04 Get course by ID (public - no auth needed)
 GET http://localhost:8080/api/courses/1
 
-### Create a new course (uses captured token)
+### 05 Create a new course (uses captured token)
 POST http://localhost:8080/api/courses
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
@@ -84,27 +110,48 @@ Authorization: Bearer {{auth_token}}
   "endDate": "2026-09-01T00:00:00.000+00:00"
 }
 
-### Update a course (uses captured token)
+### 06 Update a course (uses captured token)
+# TODO ADMIN NOK, INSTRUCTOR OWN CHECK NOK (could update other instroructors' course?
 PUT http://localhost:8080/api/courses/1
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
   "id": 1,
-  "title": "Updated Course Title",
+  "title": "AS INSTR",
   "description": "Updated description",
   "instructorId": 2,
   "startDate": "2026-04-01T00:00:00.000+00:00",
   "endDate": "2026-09-01T00:00:00.000+00:00"
 }
 
-### Delete a course (uses captured token)
-DELETE http://localhost:8080/api/courses/3
+### 07 Delete a course (uses captured token)
+# TODO ADMIN NOK (instructor cannot delete own course? not in requirements.)
+DELETE http://localhost:8080/api/courses/1
 Authorization: Bearer {{auth_token}}
+
+
+# ==================== ENROLLMENT ENDPOINTS ====================
+### 10
+GET http://localhost:8080/api/admin/enrollments
+
+### 08
+POST http://localhost:8080/api/courses/{{id}}/enroll
+
+### 09
+GET http://localhost:8080/api/enrollments/me
+
+### 12
+DELETE http://localhost:8080/api/enrollments/{{enrollmentId}}
+
+### 11
+GET http://localhost:8080/api/instructor/enrollments
+
+
 
 # ==================== QUICK TEST SEQUENCE ====================
 
-### 1. First run this to login and capture token
+### 1. First run this to login and capture token (02)
 # @name quickLogin
 POST http://localhost:8080/api/auth/login
 Content-Type: application/json
@@ -125,7 +172,7 @@ Authorization: Bearer {{auth_token}}
 
 # ==================== DIFFERENT USER LOGINS ====================
 
-### Login as Student
+### 02 Login as Student
 # @name loginStudent
 POST http://localhost:8080/api/auth/login
 Content-Type: application/json
@@ -140,7 +187,7 @@ Content-Type: application/json
     client.log("Student token saved");
 %}
 
-### Login as Instructor
+### 02 Login as Instructor
 # @name loginInstructor
 POST http://localhost:8080/api/auth/login
 Content-Type: application/json
@@ -155,7 +202,7 @@ Content-Type: application/json
     client.log("Instructor token saved");
 %}
 
-### Login as Admin
+### 02 Login as Admin
 # @name loginAdmin
 POST http://localhost:8080/api/auth/login
 Content-Type: application/json

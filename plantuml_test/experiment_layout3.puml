@@ -1,0 +1,60 @@
+@startuml
+'layout: control order of elements
+' https://stackoverflow.com/questions/77698262/documenting-layered-architecture-with-plantuml
+LAYER_3 -[hidden]down- LAYER_2
+LAYER_2 -[hidden]down- LAYER_1
+
+package LAYER_3 {
+    component Comp30 {
+    }
+    component Comp31 {
+    }
+    component Comp32 {
+    }
+    component Comp33 {
+    }
+}
+
+package LAYER_2 {
+  component Comp20 {
+  }
+  component Comp21 {
+  }
+  component Comp22 {
+  }
+  component Comp23 {
+  }
+  component Comp24 {
+  }
+  component Comp25 {
+  }
+  component Comp26 {
+  }
+  component Comp27 {
+  }
+}
+
+package LAYER_1 {
+    component Comp10 {
+    }
+    component Comp11 {
+    }
+    component Comp12 {
+    }
+    component Comp13 {
+    }
+    component Comp14 {
+    }
+    component Comp15 {
+    }
+    component Comp16 {
+    }
+    component Comp17 {
+    }
+}
+
+Comp23 -[#6666ff,dotted]> Comp10
+Comp21 -[dotted,#red]> Comp10
+Comp20 -> Comp10
+Comp20 -> Comp16
+@enduml

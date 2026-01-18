@@ -1,0 +1,100 @@
+@startuml
+skinparam componentStyle rectangle
+
+skinparam package<<Layout>> {
+  borderColor Transparent
+  backgroundColor Transparent
+'  fontColor Transparent
+  stereotypeFontColor Transparent
+}
+
+
+package users {
+    :Visitor:
+    :Admin:         as adm
+    :Instructor:    as ins
+    :Student:       as stu
+}
+
+package Controllers <<Layout>> {
+
+    package AuthController {
+        [POST \n/api/auth/register] as register
+        [POST \n/api/auth/login] as login
+    }
+
+    package CourseController {
+        [GET \n/api/courses] as course1
+        [GET \n/api/courses/{id}] as course2
+        [POST \n/api/courses] as course3
+        [PUT  \n/api/courses/{id}] as course4
+        [DELETE \n/api/courses/{id}] as course5
+    }
+    package EnrollmentController {
+        [enrol1]
+    }
+
+    package AdminController {
+        [admin1]
+    }
+
+}
+
+package Services <<Layout>> {
+    package AuthService {
+      [AuthService.registerUser]
+      [AuthService.login]
+      [AuthService.GetAllUsers]
+    }
+
+    package CourseService {
+      [CreateCourse]
+    }
+
+    package EnrollmentService {
+      [ietsEnroll]
+    }
+
+}
+
+package repositories <<Layout>> {
+    'package CourseRepository
+    [CourseRepository]
+    package UserRepository
+    package EnrollmentRepository
+    package CustomEnrollmentRepository
+}
+
+' Hidden connections horizontal:
+' Use hidden right connections to encourage the rectangles
+' within each layer to be placed in the desired order.
+Visitor -[hidden]r- adm
+adm -[hidden]r- ins
+ins -[hidden]r- stu
+
+register -[hidden]r- login
+login -[hidden]r- course1
+
+' Hidden connections vertical:
+' Use hidden down connections between the first rectangle in each
+' layer to encourage all the layers to be left-aligned.
+' NOTE: Use longer arrows to force more space between the layers, so
+' that the visible arrows can be more clearly distinguished.
+' NOTE: Since we later create a *visible* connection from Comp20 to
+' Comp10, we omit create a hidden connection here, otherwise the
+' visible connection ends up curving to avoid the hidden one.
+Visitor -[hidden]d-- register
+register -[hidden]d-- registerUser
+Comp30 -[hidden]d-- Comp20
+'Comp20 -[hidden]d-- Comp10
+
+' Visible connections
+' -------------------
+
+' NOTE: Use norank to prevent these visible connections from taking
+' prescedence over the hidden connections and breaking the layout,
+' *except* for the visible connections which are equivalent to the
+' hidden connections that we have omitted.
+' todo see experiment/example
+
+@enduml

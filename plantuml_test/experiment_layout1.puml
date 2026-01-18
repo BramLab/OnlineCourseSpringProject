@@ -1,0 +1,25 @@
+@startuml
+'hidden container: here 1, but can contain multiple packages.
+' https://forum.plantuml.net/3648/invisible-packages-improve-layout-diagrams-visible-packages
+
+skinparam shadowing false
+'skinparam backgroundColor red
+skinparam package {
+  fontColor blue
+  stereotypeFontColor red
+}
+skinparam package<<Layout>> {
+  borderColor Transparent
+  backgroundColor Transparent
+  'fontColor Transparent
+  stereotypeFontColor Transparent
+}
+
+package p1 <<Dummy>> {
+class Foo1 <<Other>>
+}
+
+package p2 <<Layout>> {
+class Foo2
+}
+@enduml
