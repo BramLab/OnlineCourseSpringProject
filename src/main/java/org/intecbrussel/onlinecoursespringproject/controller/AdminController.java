@@ -17,6 +17,12 @@ public class AdminController {
 
     private final UserService userService;
 
+    //AdminController (admin only)
+    //Methode Endpoint
+    //GET     /api/admin/users                                    13
+    //PUT     /api/admin/users/{id}/role                          14
+    //DELETE  /api/admin/users/{id}                               15
+
     @PreAuthorize("hasAnyRole('ADMIN')") //redundant
     @PutMapping("/users/{id}/role")
     public UserResponse updateUserChangeRole(@PathVariable Long id, @RequestBody UserChangeRoleRequest userChangeRoleRequest) {

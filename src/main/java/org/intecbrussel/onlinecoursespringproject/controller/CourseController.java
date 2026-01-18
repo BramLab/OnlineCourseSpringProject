@@ -3,9 +3,7 @@ package org.intecbrussel.onlinecoursespringproject.controller;
 import lombok.RequiredArgsConstructor;
 import org.intecbrussel.onlinecoursespringproject.dto.CourseRequest;
 import org.intecbrussel.onlinecoursespringproject.dto.CourseResponse;
-import org.intecbrussel.onlinecoursespringproject.repository.CourseRepository;
 import org.intecbrussel.onlinecoursespringproject.service.CourseService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,17 +15,19 @@ import java.util.List;
 public class CourseController {
     private final CourseService courseService;
 
+//    CourseController
+//    Methode Endpoint            Auth
+//    GET     /api/courses        public                          03
+//    GET     /api/courses/{id}   public                          04
+//    POST    /api/courses        INSTRUCTOR/ADMIN                05
+//    PUT     /api/courses/{id}   INSTRUCTOR (own) / ADMIN        06
+//    DELETE  /api/courses/{id}   ADMIN                           07
+
     @GetMapping
     public List<CourseResponse> getAllCourses() {
         return courseService.getAllCourses();
     }
-    //CourseController
-    //Methode Endpoint            Auth
-    //GET     /api/courses        public
-    //GET     /api/courses/{id}   public
-    //POST    /api/courses        INSTRUCTOR/ADMIN
-    //PUT     /api/courses/{id}   INSTRUCTOR (own) / ADMIN
-    //DELETE  /api/courses/{id}   ADMIN
+
     @GetMapping("/{id}")
     public CourseResponse getCourseById(@PathVariable long id) {
         return courseService.getCourseById(id);

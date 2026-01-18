@@ -1,10 +1,7 @@
 package org.intecbrussel.onlinecoursespringproject.service;
 
 import lombok.RequiredArgsConstructor;
-import org.intecbrussel.onlinecoursespringproject.model.Role;
 import org.intecbrussel.onlinecoursespringproject.security.JwtUtil;
-import io.jsonwebtoken.Jwt;
-import io.jsonwebtoken.Jwts;
 import jakarta.transaction.Transactional;
 import org.intecbrussel.onlinecoursespringproject.dto.*;
 import org.intecbrussel.onlinecoursespringproject.exception.DuplicateEnrollmentException;
@@ -12,11 +9,8 @@ import org.intecbrussel.onlinecoursespringproject.exception.MissingDataException
 import org.intecbrussel.onlinecoursespringproject.exception.ResourceNotFoundException;
 import org.intecbrussel.onlinecoursespringproject.model.User;
 import org.intecbrussel.onlinecoursespringproject.repository.UserRepository;
-import org.springframework.security.core.token.Token;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -29,11 +23,11 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtil jwtUtil;
 
     // replaced by @RequiredArgsConstructor
-//    public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
-//        this.userRepository = userRepository;
-//        this.passwordEncoder = passwordEncoder;
-//        this.jwtUtil = jwtUtil;
-//    }
+    //    public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+    //        this.userRepository = userRepository;
+    //        this.passwordEncoder = passwordEncoder;
+    //        this.jwtUtil = jwtUtil;
+    //    }
 
     @Override
     public UserResponse registerUser(RegisterRequest registerRequest) {

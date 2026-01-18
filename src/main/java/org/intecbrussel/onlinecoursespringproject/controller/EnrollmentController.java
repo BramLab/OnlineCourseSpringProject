@@ -21,12 +21,13 @@ public class EnrollmentController {
     private final UserService userService;
     private final EnrollmentRepository enrollmentRepository;
 
+    //EnrollmentController
     //Methode Endpoint Auth
-    //POST /api/courses/{id}/enroll STUDENT/ADMIN
-    //GET /api/enrollments/me STUDENT
-    //GET /api/instructor/enrollments INSTRUCTOR
-    //GET /api/admin/enrollments ADMIN
-    //DELETE /api/enrollments/{id} STUDENT (self) / ADMIN
+    //POST    /api/courses/{id}/enroll    STUDENT/ADMIN           08
+    //GET     /api/enrollments/me         STUDENT                 09
+    //GET     /api/instructor/enrollments INSTRUCTOR              10
+    //GET     /api/admin/enrollments      ADMIN                   11
+    //DELETE /api/enrollments/{id}        STUDENT (self) / ADMIN  12
 
     @PostMapping("/courses/{id}/enroll")
     @PreAuthorize("hasAnyRole('STUDENT','ADMIN')")
@@ -42,18 +43,22 @@ public class EnrollmentController {
     public List<EnrollmentResponse> getEnrollmentsForInstructor() {
         return enrollmentService.listEnrollments();
     }
+
     //GET /api  /enrollments/me STUDENT
     @GetMapping("/enrollments/me")
     @PreAuthorize("hasRole('INSTRUCTOR')")
     public List<EnrollmentResponse> getEnrollmentsForStudent() {
         return enrollmentService.listEnrollments();
     }
+
     //GET /api  /admin/enrollments ADMIN
     @GetMapping("/admin/enrollments")
     @PreAuthorize("hasRole('INSTRUCTOR')")
     public List<EnrollmentResponse> getAllEnrollments() {
         return enrollmentService.listEnrollments();
     }
+
+
 
     @DeleteMapping("/enrollments/{enrollmentId}")
     @PreAuthorize("hasAnyRole('STUDENT', 'ADMIN')")

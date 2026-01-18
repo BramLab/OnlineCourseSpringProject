@@ -16,6 +16,10 @@ public class AuthController {
 
     private final AuthService authService;
 
+    //AuthController (public)
+    //Methode Endpoint
+    //POST    /api/auth/register                                  01
+    //POST    /api/auth/login                                     02
 
     @PostMapping("/register")
     public UserResponse register(@Valid @RequestBody RegisterRequest registerRequest) {
