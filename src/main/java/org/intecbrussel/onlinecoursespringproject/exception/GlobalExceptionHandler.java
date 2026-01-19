@@ -19,16 +19,7 @@ public class GlobalExceptionHandler {
         Map<String, String> error = new HashMap<>();
         error.put("message", exception.getMessage());
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(error);
-    }
-
-    @ExceptionHandler({ResourceNotFoundException.class})
-    public ResponseEntity<Map<String, String>> handleResourceNotFoundException(ResourceNotFoundException exception) {
-        Map<String, String> error = new HashMap<>();
-        error.put("message", exception.getMessage());
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
+                .status(HttpStatus.BAD_REQUEST) //400
                 .body(error);
     }
 
@@ -43,7 +34,7 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(HttpStatus.BAD_REQUEST) //400
                 .body(errors);
     }
 
@@ -53,7 +44,26 @@ public class GlobalExceptionHandler {
         Map<String, String> error = new HashMap<>();
         error.put("message", exception.getMessage());
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(HttpStatus.BAD_REQUEST) //400
+                .body(error);
+    }
+
+    @ExceptionHandler({UnauthorizedActionException.class})
+    public ResponseEntity<Map<String, String>> handleUnauthorizedActionException(
+            UnauthorizedActionException exception) {
+        Map<String, String> error = new HashMap<>();
+        error.put("message", exception.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN) //403
+                .body(error);
+    }
+
+    @ExceptionHandler({ResourceNotFoundException.class})
+    public ResponseEntity<Map<String, String>> handleResourceNotFoundException(ResourceNotFoundException exception) {
+        Map<String, String> error = new HashMap<>();
+        error.put("message", exception.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND) //404
                 .body(error);
     }
 
@@ -61,7 +71,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({RuntimeException.class})
     public ResponseEntity<Object> handleRuntimeException(RuntimeException exception) {
         return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .status(HttpStatus.INTERNAL_SERVER_ERROR) //500
                 .body(exception.getMessage());
     }
 
