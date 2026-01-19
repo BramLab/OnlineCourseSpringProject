@@ -516,23 +516,81 @@ Authorization: Bearer {{auth_token}}
 
 # ==================== ENROLLMENT TESTS ====================
 
-### ENROLL-SETUP: Login as different users for enrollment tests
-# @name login_for_enrollment
-POST http://localhost:8080/api/auth/login
-Content-Type: application/json
+#### ENROLL-SETUP: Login as different users for enrollment tests
+## @name login_for_enrollment
+#POST http://localhost:8080/api/auth/login
+#Content-Type: application/json
+#
+#{
+#  "username": "user_admin1",
+#  "password": "a1"
+#}
+#
+#> {%
+#    client.global.set("admin_token", response.body.token);
+#    client.global.set("admin_id", response.body.id);
+#    client.log("✓ Admin logged in for enrollment tests");
+#%}
+#
+#### ENROLL-SETUP: Login as Student
+#POST http://localhost:8080/api/auth/login
+#Content-Type: application/json
+#
+#{
+#  "username": "user_student1",
+#  "password": "s1"
+#}
+#
+#> {%
+#    client.global.set("student_token", response.body.token);
+#    client.global.set("student_id", response.body.id);
+#    client.log("✓ Student logged in");
+#%}
+#
+#### ENROLL-SETUP: Login as Student 2
+#POST http://localhost:8080/api/auth/login
+#Content-Type: application/json
+#
+#{
+#  "username": "user_student2",
+#  "password": "s2"
+#}
+#
+#> {%
+#    client.global.set("student2_token", response.body.token);
+#    client.global.set("student2_id", response.body.id);
+#    client.log("✓ Student 2 logged in");
+#%}
+#
+#### ENROLL-SETUP: Login as Instructor
+#POST http://localhost:8080/api/auth/login
+#Content-Type: application/json
+#
+#{
+#  "username": "user_instructor1",
+#  "password": "i1"
+#}
+#
+#> {%
+#    client.global.set("instructor_token", response.body.token);
+#    client.global.set("instructor_id", response.body.id);
+#    client.log("✓ Instructor logged in");
+#%}
+#
+#### ENROLL-SETUP: Get available course for testing
+#GET http://localhost:8080/api/courses
+#
+#> {%
+#    if (response.body.length > 0) {
+#        client.global.set("test_course_for_enrollment", response.body[0].id);
+#        client.log("✓ Found course ID: " + response.body[0].id);
+#    }
+#%}
 
-{
-  "username": "user_admin1",
-  "password": "a1"
-}
+# ==================== ENROLLMENT TESTS ====================
 
-> {%
-    client.global.set("admin_token", response.body.token);
-    client.global.set("admin_id", response.body.id);
-    client.log("✓ Admin logged in for enrollment tests");
-%}
-
-### ENROLL-SETUP: Login as Student
+### ENROLL-SETUP-1: Login as Student
+# @name login_student_for_enrollment
 POST http://localhost:8080/api/auth/login
 Content-Type: application/json
 
@@ -544,10 +602,10 @@ Content-Type: application/json
 > {%
     client.global.set("student_token", response.body.token);
     client.global.set("student_id", response.body.id);
-    client.log("✓ Student logged in");
+    client.log("✓ Student 1 logged in, ID: " + response.body.id);
 %}
 
-### ENROLL-SETUP: Login as Student 2
+### ENROLL-SETUP-2: Login as Student 2
 POST http://localhost:8080/api/auth/login
 Content-Type: application/json
 
@@ -559,10 +617,10 @@ Content-Type: application/json
 > {%
     client.global.set("student2_token", response.body.token);
     client.global.set("student2_id", response.body.id);
-    client.log("✓ Student 2 logged in");
+    client.log("✓ Student 2 logged in, ID: " + response.body.id);
 %}
 
-### ENROLL-SETUP: Login as Instructor
+### ENROLL-SETUP-3: Login as Instructor
 POST http://localhost:8080/api/auth/login
 Content-Type: application/json
 
@@ -574,16 +632,31 @@ Content-Type: application/json
 > {%
     client.global.set("instructor_token", response.body.token);
     client.global.set("instructor_id", response.body.id);
-    client.log("✓ Instructor logged in");
+    client.log("✓ Instructor logged in, ID: " + response.body.id);
 %}
 
-### ENROLL-SETUP: Get available course for testing
+### ENROLL-SETUP-4: Login as Admin
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "user_admin1",
+  "password": "a1"
+}
+
+> {%
+    client.global.set("admin_token", response.body.token);
+    client.global.set("admin_id", response.body.id);
+    client.log("✓ Admin logged in, ID: " + response.body.id);
+%}
+
+### ENROLL-SETUP-5: Get available course for testing
 GET http://localhost:8080/api/courses
 
 > {%
     if (response.body.length > 0) {
         client.global.set("test_course_for_enrollment", response.body[0].id);
-        client.log("✓ Found course ID: " + response.body[0].id);
+        client.log("✓ Using course ID: " + response.body[0].id + " for enrollment tests");
     }
 %}
 
@@ -595,7 +668,7 @@ Authorization: Bearer {{student_token}}
 
 > {%
     client.test("Student self-enroll: Status is 200", function() {
-        client.assert(response.status === 200, "Expected status 200");
+        client.assert(response.status === 200, "Expected status 200, got " + response.status);
     });
 
     client.test("Student self-enroll: Returns enrollment", function() {
@@ -605,7 +678,7 @@ Authorization: Bearer {{student_token}}
     });
 
     client.global.set("test_enrollment_id", response.body.id);
-    //client.log("✓ Student enrolled successfully, enrollment ID: " + response.body.id);
+    client.log("✓ Student enrolled successfully, enrollment ID: " + response.body.id);
 %}
 
 ### TEST-ENROLL-2: Student tries to enroll again - Should fail (duplicate)
