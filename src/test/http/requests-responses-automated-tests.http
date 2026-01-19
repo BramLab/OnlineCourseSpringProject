@@ -698,6 +698,11 @@ Authorization: Bearer {{instructor_token}}
     client.test("Instructor enrollment: Should return 403", function() {
         client.assert(response.status === 403, "Expected status 403");
     });
+    client.test("Access Denied message expected", function() {
+        client.assert(response.body.message === "Access Denied", "Should have error message");
+    });
+
+
 
     //client.log("✓ Instructor enrollment correctly rejected");
 %}
