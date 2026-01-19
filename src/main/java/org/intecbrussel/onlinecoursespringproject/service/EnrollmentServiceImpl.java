@@ -69,9 +69,9 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
 
-        if(loggedInUser.getRole() != Role.STUDENT) {
-            throw new UnauthorizedActionException("You must be STUDENT and be logged-in.");
-        }
+//        if(loggedInUser.getRole() != Role.STUDENT) {
+//            throw new UnauthorizedActionException("You must be STUDENT and be logged-in.");
+//        }
 
         List<Enrollment> enrollmentsForStudent = enrollmentRepository.findForStudent(loggedInUser.getId());
         for (Enrollment enrollment : enrollmentsForStudent){
