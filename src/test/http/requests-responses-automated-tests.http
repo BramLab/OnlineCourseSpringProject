@@ -699,7 +699,7 @@ Authorization: Bearer {{instructor_token}}
         client.assert(response.status === 403, "Expected status 403");
     });
     client.test("Access Denied message expected", function() {
-        client.assert(response.body.message === "Access Denied", "Should have error message");
+        client.assert(response.body.message === "You must be STUDENT and be logged-in.", "Should have error message");
     });
 
 

@@ -36,7 +36,7 @@ public class EnrollmentController {
     }
 
     @PostMapping("/courses/{course_id}/enroll")
-    @PreAuthorize("hasRole('STUDENT')")
+    //@PreAuthorize("hasRole('STUDENT')")
     public EnrollmentResponse enrollSelf(@PathVariable Long course_id) {
         return enrollmentService.createEnrollmentForLoggedInUser(course_id);
     }
@@ -67,7 +67,7 @@ public class EnrollmentController {
 
 
     @DeleteMapping("/enrollments/{enrollmentId}")
-    @PreAuthorize("hasAnyRole('STUDENT', 'ADMIN')")
+    //@PreAuthorize("hasAnyRole('STUDENT', 'ADMIN')")
     public void cancelEnrollment(@PathVariable Long enrollmentId) {
         enrollmentService.cancelEnrollment(enrollmentId);
     }
