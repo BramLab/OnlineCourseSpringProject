@@ -14,6 +14,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.sql.Date;
+import java.util.List;
 
 //@SpringBootApplication = @Configuration, @EnableAutoConfiguration and @ComponentScan
 @Configuration
@@ -25,62 +26,69 @@ public class UserConfig {
                                                    CourseRepository courseRepository,
                                                    EnrollmentRepository enrollmentRepository,
                                                    PasswordEncoder passwordEncoder) {
-        return args -> {
 
-            User user_instructor1 = new User();
-            user_instructor1.setUsername("user_instructor1");
-            user_instructor1.setEmail("user_instructor1@c.com");
-            user_instructor1.setRole(Role.INSTRUCTOR);
-            user_instructor1.setPasswordHashed(passwordEncoder.encode("i1"));
-            //user_instructor1.setPasswordHashed(clearTextToSHA256HashToBase64("i1"));
-            userRepository.save(user_instructor1);
+        List<User> users = userRepository.findAll();
+        if(users.isEmpty()) {
 
-            User user_instructor2 = new User(0, "user_instructor2", "user_instructor2@c.com", Role.INSTRUCTOR
-                    , passwordEncoder.encode("i2"));    //, clearTextToSHA256HashToBase64("i2"));
-            userRepository.save(user_instructor2);
+            return args -> {
 
-            User user_instructor3 = new User(0, "user_instructor3", "user_instructor3@c.com", Role.INSTRUCTOR
-                    , passwordEncoder.encode("i3"));    //, clearTextToSHA256HashToBase64("i2"));
-            userRepository.save(user_instructor3);
+                User user_instructor1 = new User();
+                user_instructor1.setUsername("user_instructor1");
+                user_instructor1.setEmail("user_instructor1@c.com");
+                user_instructor1.setRole(Role.INSTRUCTOR);
+                user_instructor1.setPasswordHashed(passwordEncoder.encode("i1"));
+                //user_instructor1.setPasswordHashed(clearTextToSHA256HashToBase64("i1"));
+                userRepository.save(user_instructor1);
 
-            User user_student1 = new User(0, "user_student1", "user_student1@c.com", Role.STUDENT
-                    , passwordEncoder.encode("s1"));
-            userRepository.save(user_student1);
+                User user_instructor2 = new User(0, "user_instructor2", "user_instructor2@c.com", Role.INSTRUCTOR
+                        , passwordEncoder.encode("i2"));    //, clearTextToSHA256HashToBase64("i2"));
+                userRepository.save(user_instructor2);
 
-            User user_student2 = new User(0, "user_student2", "user_student2@c.com", Role.STUDENT
-                    , passwordEncoder.encode("s2"));
-            userRepository.save(user_student2);
+                User user_instructor3 = new User(0, "user_instructor3", "user_instructor3@c.com", Role.INSTRUCTOR
+                        , passwordEncoder.encode("i3"));    //, clearTextToSHA256HashToBase64("i2"));
+                userRepository.save(user_instructor3);
 
-            User user_student3 = new User(0, "user_student3", "user_student3@c.com", Role.STUDENT
-                    , passwordEncoder.encode("s3"));
-            userRepository.save(user_student3);
+                User user_student1 = new User(0, "user_student1", "user_student1@c.com", Role.STUDENT
+                        , passwordEncoder.encode("s1"));
+                userRepository.save(user_student1);
 
-            User user_admin1 = new User(0, "user_admin1", "user_admin1@c.com", Role.ADMIN
-                    , passwordEncoder.encode("a1"));
-            userRepository.save(user_admin1);
+                User user_student2 = new User(0, "user_student2", "user_student2@c.com", Role.STUDENT
+                        , passwordEncoder.encode("s2"));
+                userRepository.save(user_student2);
 
-            User user_admin2 = new User(0, "user_admin2", "user_admin2@c.com", Role.ADMIN
-                    , passwordEncoder.encode("a2"));
-            userRepository.save(user_admin2);
+                User user_student3 = new User(0, "user_student3", "user_student3@c.com", Role.STUDENT
+                        , passwordEncoder.encode("s3"));
+                userRepository.save(user_student3);
 
+                User user_admin1 = new User(0, "user_admin1", "user_admin1@c.com", Role.ADMIN
+                        , passwordEncoder.encode("a1"));
+                userRepository.save(user_admin1);
 
-            Course course_java = new Course(  0, "Java", "OOP, preparation for OCA", user_instructor1
-                    , Date.valueOf("2026-04-01"), Date.valueOf("2026-09-01")  );
-            courseRepository.save(course_java);
-            Course course_tws = new Course(0, "Tws", "cv, brief, solliciteren", user_instructor2,
-                    Date.valueOf("2026-09-02"), Date.valueOf("2026-10-01")  );
-            courseRepository.save(course_tws);
-            Course course_html = new Course(0, "html", "front end", user_instructor3,
-                    Date.valueOf("2026-09-02"), Date.valueOf("2026-10-01")  );
-            courseRepository.save(course_html);
+                User user_admin2 = new User(0, "user_admin2", "user_admin2@c.com", Role.ADMIN
+                        , passwordEncoder.encode("a2"));
+                userRepository.save(user_admin2);
 
 
-            Enrollment enrollment1 = new Enrollment(0, user_student1, course_java);
-            enrollmentRepository.save(enrollment1);
-            Enrollment enrollment2 = new Enrollment(0, user_student2, course_tws);
-            enrollmentRepository.save(enrollment2);
+                Course course_java = new Course(0, "Java", "OOP, preparation for OCA", user_instructor1
+                        , Date.valueOf("2026-04-01"), Date.valueOf("2026-09-01"));
+                courseRepository.save(course_java);
+                Course course_tws = new Course(0, "Tws", "cv, brief, solliciteren", user_instructor2,
+                        Date.valueOf("2026-09-02"), Date.valueOf("2026-10-01"));
+                courseRepository.save(course_tws);
+                Course course_html = new Course(0, "html", "front end", user_instructor3,
+                        Date.valueOf("2026-09-02"), Date.valueOf("2026-10-01"));
+                courseRepository.save(course_html);
 
-        };
+
+                Enrollment enrollment1 = new Enrollment(0, user_student1, course_java);
+                enrollmentRepository.save(enrollment1);
+                Enrollment enrollment2 = new Enrollment(0, user_student2, course_tws);
+                enrollmentRepository.save(enrollment2);
+
+            };
+        }else  {
+            return args -> {};
+        }
     }
 
     //Base64 encoded SHA-256 hash

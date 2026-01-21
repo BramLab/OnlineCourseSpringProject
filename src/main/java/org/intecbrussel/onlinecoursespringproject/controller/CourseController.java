@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.intecbrussel.onlinecoursespringproject.dto.CourseRequest;
 import org.intecbrussel.onlinecoursespringproject.dto.CourseResponse;
 import org.intecbrussel.onlinecoursespringproject.service.CourseService;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,19 +32,16 @@ public class CourseController {
         return courseService.getCourseById(id);
     }
 
-    @PreAuthorize("hasAnyRole('INSTRUCTOR','ADMIN')")
     @PostMapping
     public CourseResponse addCourse(@RequestBody CourseRequest courseRequest) {
         return courseService.createCourse(courseRequest);
     }
 
-    @PreAuthorize("hasAnyRole('INSTRUCTOR','ADMIN')")
     @PutMapping("/{id}")
     public CourseResponse updateCourse(@PathVariable long id, @RequestBody CourseRequest courseRequest) {
         return courseService.updateCourse(id, courseRequest);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN')")
     @DeleteMapping("/{id}")
     public void deleteCourse(@PathVariable long id) {
         courseService.deleteCourse(id);

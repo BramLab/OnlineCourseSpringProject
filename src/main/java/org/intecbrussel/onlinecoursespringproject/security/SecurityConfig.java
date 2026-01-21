@@ -31,17 +31,31 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
                 .authorizeHttpRequests(auth -> auth
+                        // Public endpoints
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/courses/**").permitAll()
+
+                        // Course management
                         .requestMatchers(HttpMethod.POST, "/api/courses").hasAnyRole("INSTRUCTOR", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/courses/**").hasAnyRole("INSTRUCTOR", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/courses/**").hasRole("ADMIN")
+
+                        // Enrollment endpoints
+                        .requestMatchers(HttpMethod.POST, "/api/courses/*/enroll/*").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/courses/*/enroll").authenticated() // Student self-enroll
+                        .requestMatchers("/api/enrollments/me").hasRole("STUDENT")
+                        .requestMatchers("/api/instructor/enrollments").hasRole("INSTRUCTOR")
+                        .requestMatchers("/api/admin/enrollments").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/enrollments/*").authenticated() // Logic in service
+
+                        // Admin endpoints
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
                         .anyRequest().authenticated()
                 )
 
-                // trying to fix Response code: 500 where 403 is expected.
                 .exceptionHandling(ex -> ex
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
                             response.setStatus(HttpServletResponse.SC_FORBIDDEN);

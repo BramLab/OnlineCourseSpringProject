@@ -147,22 +147,22 @@ DELETE  /api/admin/users/{id}                               15
 5. Security package (VERPLICHT)
 
 Vereisten
-1. Password hashing met BCrypt
-2. JWT token genereren met claims: sub (username) en role
-3. JwtAuthFilter (OncePerRequestFilter)
-4. Stateless session policy
-5. CORS configuratie voor frontend (bv. http://localhost:5173)
-6. Endpoints beveiligen volgens autorisatiematrix
-7. @PreAuthorize of security rules gebruiken voor rolchecks6.
+1. Password hashing met BCrypt  -> defined in class SecurityConfig
+2. JWT token genereren met claims: sub (username) en role       -> in class JwtUtil, method generateToken
+3. JwtAuthFilter (OncePerRequestFilter)     -> in class JwtAuthFilter extends OncePerRequestFilter, doFilterInternal
+4. Stateless session policy     -> in class SecurityConfig, securityFilterChain
+5. CORS configuratie voor frontend (bv. http://localhost:5173)  -> class CorsConfig
+6. Endpoints beveiligen volgens autorisatiematrix   -> authorizeHttpRequests (in securityFilterChain).
+    (ook geprobeerd met PreAuthorize maar kreeg verkeerde foutmelding niet juist).
+7. @PreAuthorize of security rules gebruiken voor rolchecks -> security rules in Service classes.
 
-Exception Handling (VERPLICHT)
+6. Exception Handling (VERPLICHT)
 • ResourceNotFoundException
 • UnauthorizedActionException
 • DuplicateEnrollmentException
 • GlobalExceptionHandler met nette JSON errors
 
-7. BOOTSTRAP – DataLoader (VERPLICHT)
-
+7. BOOTSTRAP – DataLoader (VERPLICHT) -> class UserConfig -> dataLoader_commandLineRunner
 
 Vereisten
 1. Seed data bij opstarten, enkel als DB leeg is
@@ -183,17 +183,14 @@ jwt.secret=${JWT_SECRET}
 jwt.expiration-hours=24
 
 9. Postman Collectie (VERPLICHT)
-
-Cursisten leveren een Postman collectie met:
-• Register + login (token krijgen)
-• Course create/update/delete volgens rollen
-• Enrollment acties volgens rollen• Admin user management
-• Tests met Authorization header:
-    o Authorization: Bearer <token>
+-> Andere test gemaakt op basis van http requests. Zoals vooraf gevraagd en besproken met docent.
+Bij Tests: requests-responses-automated-tests.http (doorloopt in 1 keer alle tests).
 
 10. SQL Dump (VERPLICHT)
 • SQL export van MySQL database
 • Bewijs van tabellen + relaties
+-> onlinecoursedb_localhost__2_-2026_01_21_21_14_15-dump.sql
+-> db_diagram.png
 
 RESULTAAT
 De cursist levert:
